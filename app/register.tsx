@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+// Uprav cestu podľa tvojho projektu, napr. '@/firebase' alebo './firebase'
+import { auth, db } from './firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function RegisterScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState<string | null>(null); // 👈 pridáme stav pre rolu
 
-  const handleRegister = () => {
-    if (!email || !password || !confirmPassword || !role) {
-      Alert.alert('Chyba', 'Vyplň všetky polia a vyber rolu');
+  const handleRegister = async () => {
+    if (!email || !password || !confirmPassword) {
+      Alert.alert('Chyba', 'Vyplň všetky polia');
       return;
     }
     if (password !== confirmPassword) {
@@ -19,9 +22,22 @@ export default function RegisterScreen() {
       return;
     }
 
-    // Tu bude logika registrácie (API call, uloženie používateľa...)
-    Alert.alert('Úspech', `Registrácia prebehla úspešne ako ${role === 'coach' ? 'Tréner' : 'Hráč'}!`);
-    router.replace('/login');
+    try {
+      // 1️⃣ Vytvorenie používateľa v Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // 2️⃣ Uloženie údajov do Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        email: user.email,
+        createdAt: new Date(),
+      });
+
+      Alert.alert('Úspech', `Registrácia prebehla úspešne!`);
+      router.replace('/choose-join-or-create');
+    } catch (error: any) {
+      Alert.alert('Chyba', error.message);
+    }
   };
 
   return (
@@ -57,36 +73,14 @@ export default function RegisterScreen() {
         value={confirmPassword}
         onChangeText={setConfirmPassword}
       />
-
-      <Text>Rola</Text>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: 20 }}>
-        <TouchableOpacity
-          style={[
-            styles.roleButton,
-            role === 'player' && styles.roleButtonSelected,
-          ]}
-          onPress={() => setRole('player')}
-        >
-          <Text style={[styles.roleText, role === 'player' && styles.roleTextSelected]}>Hráč</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.roleButton,
-            role === 'coach' && styles.roleButtonSelected,
-          ]}
-          onPress={() => setRole('coach')}
-        >
-          <Text style={[styles.roleText, role === 'coach' && styles.roleTextSelected]}>Tréner</Text>
-        </TouchableOpacity>
-      </View>
-
       <Button title="Registrovať sa" onPress={handleRegister} />
     </View>
   );
 }
 
-const styles = {
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -113,4 +107,4 @@ const styles = {
   roleTextSelected: {
     color: 'white',
   },
-};
+});
