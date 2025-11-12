@@ -81,7 +81,7 @@ export default function LoginScreen() {
 
       <View style={{ marginTop: 20, alignItems: 'center' }}>
         <Text>Nemáš účet?</Text>
-        <Text style={{ color: 'blue', marginTop: 8 }} onPress={() => router.push('/register')}>
+        <Text style={{ color: 'blue', marginTop: 8 }} onPress={() => router.push('../registration/register')}>
           Zaregistruj sa
         </Text>
       </View>

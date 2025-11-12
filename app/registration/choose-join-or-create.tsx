@@ -11,14 +11,14 @@ export default function ChooseTeamAction() {
       
       <TouchableOpacity
         style={styles.button}
-        onPress={() => router.push('/join-team')}
+        onPress={() => router.push('/registration/join-team')}
       >
         <Text style={styles.buttonText}>Pridať sa do tímu</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => router.push('/create-team')}
+        onPress={() => router.push('../team/create-team')}
       >
         <Text style={styles.buttonText}>Vytvoriť nový tím</Text>
       </TouchableOpacity>

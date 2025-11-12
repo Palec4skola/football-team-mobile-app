@@ -25,7 +25,7 @@ export default function GenerateCode() {
       'Upozornenie',
       `Pošli tento kód hráčovi, aby sa mohol pridať do tímu: ${code}`
     );
-    router.replace('/TeamManagement'); // alebo iná obrazovka podľa potreby
+    router.replace('../(tabs)/team'); // alebo iná obrazovka podľa potreby
   };
 
   return (

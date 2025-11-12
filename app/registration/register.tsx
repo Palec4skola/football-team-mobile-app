@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 // Uprav cestu podľa tvojho projektu, napr. '@/firebase' alebo './firebase'
-import { auth, db } from './firebase';
+import { auth, db } from '../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword) {
@@ -29,12 +32,14 @@ export default function RegisterScreen() {
 
       // 2️⃣ Uloženie údajov do Firestore
       await setDoc(doc(db, 'users', user.uid), {
+        firstName: firstName,
+        lastName: lastName,
         email: user.email,
         createdAt: new Date(),
       });
 
       Alert.alert('Úspech', `Registrácia prebehla úspešne!`);
-      router.replace('/choose-join-or-create');
+      router.replace('/registration/choose-join-or-create');
     } catch (error: any) {
       Alert.alert('Chyba', error.message);
     }
@@ -45,6 +50,19 @@ export default function RegisterScreen() {
       <Text style={{ fontSize: 26, fontWeight: 'bold', marginBottom: 30, textAlign: 'center' }}>
         Registrácia
       </Text>
+      <Text>Meno</Text>
+      <TextInput
+        style={styles.input}
+        value={firstName}
+        onChangeText={setFirstName}
+      />
+
+      <Text>Priezvisko</Text>
+      <TextInput
+        style={styles.input}
+        value={lastName}
+        onChangeText={setLastName}
+      />
 
       <Text>Email</Text>
       <TextInput
@@ -73,6 +91,7 @@ export default function RegisterScreen() {
         value={confirmPassword}
         onChangeText={setConfirmPassword}
       />
+
       <Button title="Registrovať sa" onPress={handleRegister} />
     </View>
   );

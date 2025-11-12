@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { db, auth } from './firebase'; // uprav podľa cesty tvojho projektu
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db, auth } from '../firebase';
+import { collection, addDoc, serverTimestamp , updateDoc, doc } from 'firebase/firestore';
 
 export default function CreateTeam() {
   const router = useRouter();
@@ -15,16 +15,22 @@ export default function CreateTeam() {
       return;
     }
     try {
-      // Uloženie nového tímu do Firestore
-      const docRef = await addDoc(collection(db, 'teams'), {
+      const teamsRef = collection(db, 'teams');
+      const docRef = await addDoc(teamsRef, {
         name: teamName,
         country: country,
-        createdBy: auth.currentUser?.uid || null,
-        createdAt: serverTimestamp(),
+        createdBy: auth.currentUser?.uid,
+        createdAt: new Date(),
+      });
+
+      // Aktualizácia používateľa s teamId
+      const userRef = doc(db, 'users', auth.currentUser!.uid);
+      await updateDoc(userRef, {
+        teamId: docRef.id,
       });
 
       Alert.alert('Úspech', `Tím '${teamName}' bol vytvorený`);
-      router.replace('/choose-team-role'); // alebo iná stránka podľa logiky
+      router.replace('../registration/choose-team-role'); 
     } catch (error: any) {
       Alert.alert('Chyba', error.message);
     }

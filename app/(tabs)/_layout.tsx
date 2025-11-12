@@ -48,20 +48,20 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="matches"
+        name="calendar"
         options={{
-          title: 'Zápasy',
+          title: 'Kalendár',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="football-outline" size={size} color={color} />
+            <Ionicons name="calendar-outline" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="trainings"
+        name="team"
         options={{
-          title: 'Tréningy',
+          title: 'Tím',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="barbell-outline" size={size} color={color} />
+            <Ionicons name="shirt-outline" size={size} color={color} />
           ),
         }}
       />
