@@ -13,6 +13,7 @@ import { auth, db } from '../firebase'; // uprav podľa cesty
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { useRouter } from 'expo-router';
 
+
 export default function TeamManagement() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -65,8 +66,11 @@ export default function TeamManagement() {
   };
 
   const handleAddPlayer = () => {
-    // Tu môžeš presmerovať na obrazovku alebo modul pre pridanie hráča, napríklad s generovaným kódom
-    router.push('../team/generate-code');
+    router.push({
+      pathname: '../team/generate-code',
+      params: { teamId: teamId },     
+    });
+    console.log("teamId: " + teamId);
   };
 
   if (isLoading) {
@@ -99,13 +103,19 @@ export default function TeamManagement() {
         data={players}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
-          <View style={styles.playerItem}>
-            <Text style={styles.playerText}>
-              {item.firstName} {item.lastName} — {item.roles?.includes('coach') ? 'Tréner' : 'Hráč'}
-              {item.id === auth.currentUser?.uid ? ' (Ty)' : ''}
-            </Text>
-          </View>
-        )}
+        <TouchableOpacity 
+          style={styles.playerItem}
+          onPress={() => router.push({
+            pathname: '../team/player-profile',
+            params: { playerId: item.id }
+          })}
+        >
+          <Text style={styles.playerText}>
+            {item.firstName} {item.lastName} — {item.roles?.includes('coach') ? 'Tréner' : 'Hráč'}
+            {item.id === auth.currentUser?.uid ? ' (Ty)' : ''}
+          </Text>
+        </TouchableOpacity>
+      )}
         ListEmptyComponent={<Text>Žiadni členovia tímu</Text>}
       />
     </View>
