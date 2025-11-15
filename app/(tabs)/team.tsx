@@ -111,7 +111,14 @@ export default function TeamManagement() {
           })}
         >
           <Text style={styles.playerText}>
-            {item.firstName} {item.lastName} — {item.roles?.includes('coach') ? 'Tréner' : 'Hráč'}
+            {item.firstName} {item.lastName} — {(() => {
+              const roles = item.roles || [];
+              if (roles.length === 0) return 'Žiadna rola';
+              if (roles.includes('coach') && roles.includes('player')) return 'Tréner a Hráč';
+              if (roles.includes('coach')) return 'Tréner';
+              if (roles.includes('player')) return 'Hráč';
+              return roles.join(', ');
+            })()}
             {item.id === auth.currentUser?.uid ? ' (Ty)' : ''}
           </Text>
         </TouchableOpacity>
