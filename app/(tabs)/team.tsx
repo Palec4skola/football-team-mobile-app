@@ -20,7 +20,8 @@ export default function TeamManagement() {
   const [isCoach, setIsCoach] = useState(false);
   const [teamId, setTeamId] = useState<string | null>(null);
   const [players, setPlayers] = useState<any[]>([]);
-  const [newPlayerEmail, setNewPlayerEmail] = useState('');
+  const [teamName, setTeamName] = useState('');
+
 
   useEffect(() => {
     async function checkUserRole() {
@@ -106,7 +107,7 @@ export default function TeamManagement() {
         <TouchableOpacity 
           style={styles.playerItem}
           onPress={() => router.push({
-            pathname: '../team/player-profile',
+            pathname: '../profile/player-profile',
             params: { playerId: item.id }
           })}
         >
@@ -123,7 +124,7 @@ export default function TeamManagement() {
           </Text>
         </TouchableOpacity>
       )}
-        ListEmptyComponent={<Text>Žiadni členovia tímu</Text>}
+        ListEmptyComponent={<Text>Žiadny členovia tímu</Text>}
       />
     </View>
   );
