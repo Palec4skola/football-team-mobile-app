@@ -1,12 +1,25 @@
-import React, { useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
+import { Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase'; // uprav podľa cesty
 
 export default function HomeScreen() {
   const navigation = useNavigation();
   const router = useRouter();
-  // Mock data - replace with real data fetching later
+  const [teamId, setTeamId] = useState<string | null>(null);
+  const [userId] = useState<string>(auth.currentUser!.uid);
+  
+useEffect(() => {
+  async function fetchTeamId() {
+    if (!userId) return;
+    const id = await getTeamIdForUser(userId);
+    setTeamId(id);
+  }
+  fetchTeamId();
+}, [userId]);
+
   const nextActivity = {
     type: 'Tréning',
     date: '2025-11-07',
@@ -38,25 +51,47 @@ export default function HomeScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Domov</Text>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Najbližšia aktivita</Text>
+      <TouchableOpacity 
+      style={styles.section}
+      onPress={() => router.push({
+        pathname:'/team/training-list',
+        params: { teamId: teamId}
+      })}>
+        <Text style={styles.sectionTitle}>Tréningy</Text>
         <Text>{nextActivity.type} - {nextActivity.date} o {nextActivity.time}</Text>
         <Text>Miesto: {nextActivity.place}</Text>
-      </View>
-      <View style={styles.section}>
+      </TouchableOpacity>
+      <TouchableOpacity 
+      style={styles.section} 
+      onPress={()=>router.push({
+        pathname: '/team/match'
+        
+        })}>
         <Text style={styles.sectionTitle}>Posledný výsledok</Text>
         <Text>Zápas proti: {lastResult.opponent}</Text>
         <Text>Dátum: {lastResult.date}</Text>
         <Text>Výsledok: {lastResult.score} ({lastResult.result})</Text>
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Tímové oznámenia</Text>
+      </TouchableOpacity  >
+      <TouchableOpacity style={styles.section} onPress={()=>router.push({
+          pathname: '/team/announcement',
+        })}>
+        <Text 
+        style={styles.sectionTitle}>Tímové oznámenia</Text>
         {announcements.map((msg, idx) => (
           <Text key={idx}>• {msg}</Text>
         ))}
-      </View>
+      </TouchableOpacity>
     </ScrollView>
   );
+  async function getTeamIdForUser(userId: string): Promise<string | null> {
+    const userDocRef = doc(db, 'users', userId);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const data = userDocSnap.data();
+      return data.teamId || null;
+    }
+    return null;
+  }
 }
 
 const styles = StyleSheet.create({

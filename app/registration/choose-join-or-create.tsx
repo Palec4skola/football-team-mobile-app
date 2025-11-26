@@ -18,7 +18,7 @@ export default function ChooseTeamAction() {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => router.push('../team/create-team')}
+        onPress={() => router.push('../create-join-team/create-team')}
       >
         <Text style={styles.buttonText}>Vytvoriť nový tím</Text>
       </TouchableOpacity>

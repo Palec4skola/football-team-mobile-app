@@ -107,7 +107,7 @@ export default function TeamManagement() {
         <TouchableOpacity 
           style={styles.playerItem}
           onPress={() => router.push({
-            pathname: '../profile/player-profile',
+            pathname: '../team/player-profile',
             params: { playerId: item.id }
           })}
         >
