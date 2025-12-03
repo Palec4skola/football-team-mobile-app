@@ -12,42 +12,42 @@ import { useSearchParams } from 'expo-router/build/hooks';
 import { useTeamCollection } from "../../hooks/useTeamCollection";
 import { useUserRole } from "../../hooks/useUserRole";
 
-export default function TrainingListScreen() {
-    const router = useRouter();
-    const params = useSearchParams();
-    const teamId = params.get("teamId");
+export default function MatchesScreen() {
+  const params = useSearchParams();
+  const teamId = params.get("teamId");
+  const router = useRouter();
+  
 
-    const { items: trainings, loadingItems } = useTeamCollection("trainings", teamId);
-    const { isCoach, loadingRole } = useUserRole();
+  const { items: matches, loadingItems } = useTeamCollection("matches", teamId);
+  const { isCoach, loadingRole } = useUserRole();
 
-    if (loadingItems || loadingRole) {
-        return <ActivityIndicator />;
-    }
+  if (loadingItems || loadingRole) {
+    return <ActivityIndicator />;
+  }
 
     return (
         <View style={styles.container}>
             {isCoach && (
                 <TouchableOpacity
                     style={styles.addButton}
-                    onPress={() => router.push({ pathname: '/team/create-training', params: { teamId } })}
+                    onPress={() => router.push({ pathname: '/team/create-match', params: { teamId } })}
                 >
-                    <Text style={styles.addButtonText}>Vytvoriť tréning</Text>
+                    <Text style={styles.addButtonText}>Pridať zápas</Text>
                 </TouchableOpacity>
             )}
 
-            {trainings.length === 0 ? (
-                <Text>Žiadne tréningy zatiaľ.</Text>
+            {matches.length === 0 ? (
+                <Text>Žiadne zápasy zatiaľ.</Text>
             ) : (
                 <FlatList
-                    data={trainings}
+                    data={matches}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
-                        <TouchableOpacity 
-                        style={styles.trainingItem}
-                        onPress={()=> router.push({pathname: '/team/training-detail', params: { teamId, trainingId: item.id }})}>
-                            <Text style={styles.trainingName}>{item.name}</Text>
+                        <TouchableOpacity style={styles.matchItem}
+                        onPress={()=> router.push({pathname: '/team/match-detail', params: { teamId, matchId: item.id }})}>
+                            <Text style={styles.matchName}>{item.opponent}</Text>
                             <Text>Dátum: {item.date?.toDate ? item.date.toDate().toLocaleDateString() : item.date}</Text>
-                            <Text>Popis: {item.description}</Text>
+                            <Text>Miesto: {item.place}</Text>
                         </TouchableOpacity>
                     )}
                 />
@@ -67,11 +67,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     addButtonText: { color: 'white', fontWeight: '600', fontSize: 16 },
-    trainingItem: {
+    matchItem: {
         marginBottom: 15,
         padding: 15,
         backgroundColor: '#f2f2f2',
         borderRadius: 8,
     },
-    trainingName: { fontSize: 18, fontWeight: 'bold' },
+    matchName: { fontSize: 18, fontWeight: 'bold' },
 });

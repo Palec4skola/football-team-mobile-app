@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../firebase';  // uprav podľa cesty
+import { db } from '../../firebase';  // uprav podľa cesty
 import { useSearchParams } from 'expo-router/build/hooks';
 
 // Funkcia na generovanie unikátneho 4-miestneho kódu (A-Z, 0-9)

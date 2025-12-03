@@ -9,14 +9,14 @@ export default function TabsLayout() {
   const pathname = usePathname();
 
   const handleGoHome = () => {
-    router.push('../(tabs)');
+    router.push('..');
   };
 
   const handleOpenChat = () => {
     router.push('../chat/chat-list');
   };
 
-  const showBackArrow = pathname !== '/(tabs)';
+  const showBackArrow = pathname !== '..';
 
   return (
     <Stack

@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { auth, db } from '../firebase'; // uprav podľa cesty
+import { auth, db } from '../../firebase'; // uprav podľa cesty
 import { useRouter } from 'expo-router';
 
 export default function JoinTeam() {

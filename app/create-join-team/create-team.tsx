@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, Alert, StyleSheet,TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { db, auth } from '../firebase';
+import { db, auth } from '../../firebase';
 import { collection, addDoc, serverTimestamp , updateDoc, doc } from 'firebase/firestore';
 
 export default function CreateTeam() {
   const router = useRouter();
   const [teamName, setTeamName] = useState('');
   const [country, setCountry] = useState('');
+  const [level, setLevel] = useState<'amateur' | 'professional' | null>(null);
+
 
   const handleCreateTeam = async () => {
     if (!teamName.trim() || !country.trim()) {
@@ -19,6 +21,7 @@ export default function CreateTeam() {
       const docRef = await addDoc(teamsRef, {
         name: teamName,
         country: country,
+        level: level,
         createdBy: auth.currentUser?.uid,
         createdAt: new Date(),
       });
@@ -55,6 +58,40 @@ export default function CreateTeam() {
         value={country}
         onChangeText={setCountry}
       />
+      <Text>Vyberte úroveň tímu</Text>
+      <TouchableOpacity
+  style={[
+    styles.checkboxContainer,
+    level !== 'amateur' && styles.unchecked, // ak NIE je vybraný amatér, bude biely
+  ]}
+  onPress={() => setLevel('amateur')}
+>
+  <Text
+    style={[
+      styles.checkboxLabel,
+      level !== 'amateur' && styles.uncheckedLabel, // farba textu podľa stavu
+    ]}
+  >
+    Amatérsky
+  </Text>
+</TouchableOpacity>
+
+<TouchableOpacity
+  style={[
+    styles.checkboxContainer,
+    level !== 'professional' && styles.unchecked,
+  ]}
+  onPress={() => setLevel('professional')}
+>
+  <Text
+    style={[
+      styles.checkboxLabel,
+      level !== 'professional' && styles.uncheckedLabel,
+    ]}
+  >
+    Profesionálny
+  </Text>
+</TouchableOpacity>
 
       <Button title="Vytvoriť tím" onPress={handleCreateTeam} />
     </View>
@@ -70,5 +107,24 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     marginBottom: 20,
+  },
+  checkboxContainer: {
+    borderWidth: 1,
+    borderColor: '#007AFF',
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 20,
+    alignItems: 'center',
+    backgroundColor: '#007AFF', // základne modré
+  },
+  unchecked: {
+    backgroundColor: 'white',
+  },
+  checkboxLabel: {
+    fontSize: 18,
+    color: 'white',
+  },
+  uncheckedLabel: {
+    color: '#007AFF',
   },
 });

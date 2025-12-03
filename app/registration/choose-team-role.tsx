@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Button, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { auth, db } from '../firebase'; // uprav podľa cesty
+import { auth, db } from '../../firebase'; // uprav podľa cesty
 import { doc, updateDoc } from 'firebase/firestore';
 
 export default function ChooseRole() {

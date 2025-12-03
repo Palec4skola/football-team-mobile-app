@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 // Uprav cestu podľa tvojho projektu, napr. '@/firebase' alebo './firebase'
-import { auth, db } from '../firebase';
+import { auth, db } from '../../firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 

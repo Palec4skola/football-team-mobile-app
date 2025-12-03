@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db, auth } from '../firebase';
+import { db, auth } from '../../firebase';
 import { useSearchParams } from 'expo-router/build/hooks';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -123,6 +123,32 @@ export default function PlayerProfile() {
       setModalVisible(false);
     }
   };
+    const handleRemoveFromTeam = async () => {
+    if (!playerId) return;
+
+    Alert.alert(
+      'Odstrániť hráča',
+      'Naozaj chceš odstrániť hráča z tímu?',
+      [
+        { text: 'Zrušiť', style: 'cancel' },
+        {
+          text: 'Odstrániť',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await updateDoc(doc(db, 'users', playerId), {
+                teamId: null,
+              });
+              Alert.alert('Úspech', 'Hráč bol odstránený z tímu');
+            } catch (error: any) {
+              Alert.alert('Chyba', error.message);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   
   // Funkcia na editovanie fyzických štatistík (len ukážka, môžeš použiť modal alebo inline edit)
   const handleEditStat = async (statKey: string) => {
@@ -296,6 +322,14 @@ export default function PlayerProfile() {
           </View>
         </View>
       </Modal>
+      {isCoach && (
+        <TouchableOpacity
+          style={[styles.saveButton, { backgroundColor: '#d9534f', marginTop: 30 }]}
+          onPress={handleRemoveFromTeam}
+        >
+          <Text style={styles.saveButtonText}>Odstrániť hráča z tímu</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

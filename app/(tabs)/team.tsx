@@ -9,7 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import { auth, db } from '../firebase'; // uprav podľa cesty
+import { auth, db } from '../../firebase'; // uprav podľa cesty
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { useRouter } from 'expo-router';
 
@@ -68,10 +68,9 @@ export default function TeamManagement() {
 
   const handleAddPlayer = () => {
     router.push({
-      pathname: '../team/generate-code',
-      params: { teamId: teamId },     
-    });
-    console.log("teamId: " + teamId);
+  pathname: '/create-join-team/generate-code',
+  params: { teamId }
+});
   };
 
   if (isLoading) {

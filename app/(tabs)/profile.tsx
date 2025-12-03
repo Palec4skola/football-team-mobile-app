@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Button, Alert } from 'react-native';
-import { auth } from '../firebase'; // uprav cestu podľa projektu
+import { auth } from '../../firebase'; // uprav cestu podľa projektu
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 

@@ -13,17 +13,18 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useRouter } from 'expo-router';
-import { useSearchParams} from 'expo-router/build/hooks';
+import { useSearchParams } from 'expo-router/build/hooks';
 
-export default function CreateTraining() {
+export default function CreateMatch() {
   const router = useRouter();
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const params = useSearchParams();
+  const teamId = params.get('teamId');
+
+  const [opponent, setOpponent] = useState('');
+  const [place, setPlace] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
-  const params = useSearchParams();
-  const teamId = params.get('teamId');
 
   const onChangeDate = (event: any, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === 'ios');
@@ -32,49 +33,66 @@ export default function CreateTraining() {
     }
   };
 
-  const handleAddTraining = async () => {
-    if (!name.trim()) {
-      Alert.alert('Chyba', 'Zadaj názov tréningu');
+  const handleAddMatch = async () => {
+    if (!opponent.trim()) {
+      Alert.alert('Chyba', 'Zadaj názov súpera');
+      return;
+    }
+    if (!place.trim()) {
+      Alert.alert('Chyba', 'Zadaj miesto zápasu');
+      return;
+    }
+    if (!teamId) {
+      Alert.alert('Chyba', 'Chýba ID tímu');
       return;
     }
 
     setLoading(true);
     try {
-      await addDoc(collection(db, 'trainings'), {
-        teamId: teamId,  // ID tímu ako cudzie kľúčové pole
-        name: name.trim(),
-        description: description.trim(),
+      await addDoc(collection(db, 'matches'), {
+        teamId: teamId,
+        opponent: opponent.trim(),
+        place: place.trim(),
         date: date,
+        result: null,           // môžeš neskôr doplniť po odohraní
         createdAt: serverTimestamp(),
-});
-      
-      Alert.alert('Úspech', 'Tréning bol pridaný');
-      setName('');
-      setDescription('');
+      });
+
+      Alert.alert('Úspech', 'Zápas bol pridaný');
+      setOpponent('');
+      setPlace('');
       setDate(new Date());
+
+      router.push({
+        pathname: '/team/match-list',
+        params: { teamId },
+      });
     } catch (error: any) {
       Alert.alert('Chyba', error.message);
     } finally {
       setLoading(false);
+        router.push({
+            pathname:'/team/match-list',
+            params: {teamId: teamId}
+        })
     }
-    router.push({
-        pathname:'/team/training-list',
-        params: {teamId: teamId}
-      })
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Názov tréningu</Text>
+      <Text style={styles.label}>Súper</Text>
       <TextInput
         style={styles.input}
-        value={name}
-        onChangeText={setName}
-        placeholder="Zadaj názov"
+        value={opponent}
+        onChangeText={setOpponent}
+        placeholder="Zadaj názov súpera"
       />
 
-      <Text style={styles.label}>Dátum tréningu</Text>
-      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePickerButton}>
+      <Text style={styles.label}>Dátum zápasu</Text>
+      <TouchableOpacity
+        onPress={() => setShowDatePicker(true)}
+        style={styles.datePickerButton}
+      >
         <Text>{date.toLocaleDateString()}</Text>
       </TouchableOpacity>
       {showDatePicker && (
@@ -86,17 +104,19 @@ export default function CreateTraining() {
         />
       )}
 
-      <Text style={styles.label}>Popis tréningu</Text>
+      <Text style={styles.label}>Miesto zápasu</Text>
       <TextInput
-        style={[styles.input, styles.multilineInput]}
-        value={description}
-        onChangeText={setDescription}
-        placeholder="Popíš, čo sa bude robiť na tréningu"
-        multiline
-        numberOfLines={4}
+        style={styles.input}
+        value={place}
+        onChangeText={setPlace}
+        placeholder="Zadaj miesto (ihrisko, hala...)"
       />
 
-      <Button title={loading ? 'Ukladám...' : 'Pridať tréning'} onPress={handleAddTraining} disabled={loading} />
+      <Button
+        title={loading ? 'Ukladám...' : 'Pridať zápas'}
+        onPress={handleAddMatch}
+        disabled={loading}
+      />
     </View>
   );
 }
@@ -111,15 +131,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
-  multilineInput: {
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
   datePickerButton: {
     padding: 10,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 6,
     justifyContent: 'center',
+    marginBottom: 8,
   },
 });

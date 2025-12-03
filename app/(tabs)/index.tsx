@@ -1,25 +1,61 @@
 import React, { useEffect, useState, useLayoutEffect } from 'react';
-import { Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase'; // uprav podľa cesty
+import { auth, db } from '../../firebase';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
   const router = useRouter();
   const [teamId, setTeamId] = useState<string | null>(null);
-  const [userId] = useState<string>(auth.currentUser!.uid);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
   
 useEffect(() => {
-  async function fetchTeamId() {
-    if (!userId) return;
-    const id = await getTeamIdForUser(userId);
-    setTeamId(id);
-  }
-  fetchTeamId();
-}, [userId]);
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+        setTeamId(null); // ak nie je prihlásený, clear teamId
+      }
+    });
+    return unsubscribe;
+  }, []);
+  useEffect(() => {
+    async function fetchTeamId() {
+      if (!userId) return;
+      try {
+        const id = await getTeamIdForUser(userId);
+        setTeamId(id);
+      } catch (error) {
+        console.error('Chyba načítania teamId:', error);
+        setTeamId(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchTeamId();
+  }, [userId]);
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => router.push('/chat/chat-list')} style={{ marginRight: 12 }}>
+          <Ionicons name="chatbubbles-outline" size={28} color="#007AFF" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, router]);
+  if (loading) {
+    return (
+      <ScrollView contentContainerStyle={styles.center}>
+        <ActivityIndicator size="large" />
+      </ScrollView>
+    );
+  }
   const nextActivity = {
     type: 'Tréning',
     date: '2025-11-07',
@@ -38,15 +74,17 @@ useEffect(() => {
     'Tréningy budú od budúceho týždňa v novej hale.',
   ];
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity onPress={() => router.push('/chat/chat-list')} style={{ marginRight: 12 }}>
-          <Ionicons name="chatbubbles-outline" size={28} color="#007AFF" />
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation, router]);
+  
+  
+  async function getTeamIdForUser(userId: string): Promise<string | null> {
+    const userDocRef = doc(db, 'users', userId);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const data = userDocSnap.data();
+      return data.teamId || null;
+    }
+    return null;
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -64,9 +102,10 @@ useEffect(() => {
       <TouchableOpacity 
       style={styles.section} 
       onPress={()=>router.push({
-        pathname: '/team/match'
-        
+        pathname: '/team/match-list',
+        params: { teamId: teamId}
         })}>
+          
         <Text style={styles.sectionTitle}>Posledný výsledok</Text>
         <Text>Zápas proti: {lastResult.opponent}</Text>
         <Text>Dátum: {lastResult.date}</Text>
@@ -83,15 +122,7 @@ useEffect(() => {
       </TouchableOpacity>
     </ScrollView>
   );
-  async function getTeamIdForUser(userId: string): Promise<string | null> {
-    const userDocRef = doc(db, 'users', userId);
-    const userDocSnap = await getDoc(userDocRef);
-    if (userDocSnap.exists()) {
-      const data = userDocSnap.data();
-      return data.teamId || null;
-    }
-    return null;
-  }
+  
 }
 
 const styles = StyleSheet.create({
@@ -116,5 +147,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     marginBottom: 8,
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
