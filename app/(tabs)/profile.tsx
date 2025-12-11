@@ -2,61 +2,48 @@ import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
 import { signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Text, TouchableOpacity, View } from 'react-native';
 import profileStyles from '../../components/profileStyles';
 import { auth, db } from '../../firebase';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
 
   export default function Profile() {
     const router = useRouter();
-    const [user, setUser] = useState<any>(null);
+    // odstránené, používame useCurrentUser
     const [teamName, setTeamName] = useState<string | null>(null);
     const [teamList, setTeamList] = useState<{ id: string; name: string }[]>([]);
     const [activeTeamId, setActiveTeamId] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
 
+    const { user, loading } = useCurrentUser();
+    const teamIds: string[] = user?.teams || (user?.teamId ? [user.teamId] : []);
     useEffect(() => {
-      const fetchUser = async () => {
-        const currentUser = auth.currentUser;
-        if (!currentUser) return;
-        try {
-          const userRef = doc(db, 'users', currentUser.uid);
-          const userSnap = await getDoc(userRef);
-          if (userSnap.exists()) {
-            const userData = userSnap.data();
-            setUser(userData);
-            // Ak má user teams (pole ID tímov), načítaj názvy všetkých tímov
-            const teamIds: string[] = userData.teams || (userData.teamId ? [userData.teamId] : []);
-            setActiveTeamId(teamIds.length > 0 ? teamIds[0] : null);
-            if (teamIds.length > 0) {
-              const teamPromises = teamIds.map(async (id) => {
-                const teamRef = doc(db, 'teams', id);
-                const teamSnap = await getDoc(teamRef);
-                if (teamSnap.exists()) {
-                  const teamData = teamSnap.data();
-                  return { id, name: teamData.name || id };
-                }
-                return { id, name: id };
-              });
-              const teams = await Promise.all(teamPromises);
-              setTeamList(teams);
-              // Nastav názov aktívneho tímu
-              const activeTeam = teams.find(t => t.id === teamIds[0]);
-              setTeamName(activeTeam ? activeTeam.name : null);
-            } else {
-              setTeamList([]);
-              setTeamName(null);
-            }
+      if (user) {
+        // Inicializácia activeTeamId len raz po načítaní user
+        setActiveTeamId(teamIds.length > 0 ? teamIds[0] : null);
+        const fetchTeams = async () => {
+          if (teamIds.length > 0) {
+            const teamPromises = teamIds.map(async (id) => {
+              const teamRef = doc(db, 'teams', id);
+              const teamSnap = await getDoc(teamRef);
+              if (teamSnap.exists()) {
+                const teamData = teamSnap.data();
+                return { id, name: teamData.name || id };
+              }
+              return { id, name: id };
+            });
+            const teams = await Promise.all(teamPromises);
+            setTeamList(teams);
+            const activeTeam = teams.find(t => t.id === teamIds[0]);
+            setTeamName(activeTeam ? activeTeam.name : null);
+          } else {
+            setTeamList([]);
+            setTeamName(null);
           }
-        } catch (e) {
-          setTeamList([]);
-          setTeamName(null);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchUser();
-    }, []);
+        };
+        fetchTeams();
+      }
+    }, [user]);
 
     const handleLogout = async () => {
       try {

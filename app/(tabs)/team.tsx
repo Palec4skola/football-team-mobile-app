@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useRouter } from 'expo-router';
+import { doc, getDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   ActivityIndicator,
   Alert,
   FlatList,
-  TextInput,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
 import { auth, db } from '../../firebase'; // uprav podľa cesty
-import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import { useRouter } from 'expo-router';
+import { useTeamPlayers } from '../../hooks/useTeamPlayers';
 
 
 export default function TeamManagement() {
@@ -19,7 +19,7 @@ export default function TeamManagement() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCoach, setIsCoach] = useState(false);
   const [teamId, setTeamId] = useState<string | null>(null);
-  const [players, setPlayers] = useState<any[]>([]);
+  // Remove local players state, use hook instead
 
 
   useEffect(() => {
@@ -35,10 +35,6 @@ export default function TeamManagement() {
           }
           const currentTeamId = data.teamId || null;
           setTeamId(currentTeamId);
-
-          if (currentTeamId) {
-            await fetchPlayers(currentTeamId);
-          }
         } else {
           Alert.alert('Chyba', 'Používateľ neexistuje');
           router.replace('../login');
@@ -51,19 +47,9 @@ export default function TeamManagement() {
       }
     }
     checkUserRole();
-  }, []);
+  }, [router]);
 
-  const fetchPlayers = async (teamId: string) => {
-    try {
-      const usersRef = collection(db, 'users');
-      const q = query(usersRef, where('teamId', '==', teamId));
-      const snapshot = await getDocs(q);
-      const playersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setPlayers(playersData);
-    } catch (error) {
-      Alert.alert('Chyba', 'Nepodarilo sa načítať členov tímu');
-    }
-  };
+  // Remove fetchPlayers, use hook below
 
   const handleAddPlayer = () => {
     router.push({
@@ -72,10 +58,21 @@ export default function TeamManagement() {
 });
   };
 
-  if (isLoading) {
+  // Use the hook to get players
+  const { players, loading: playersLoading, error: playersError } = useTeamPlayers(teamId);
+
+  if (isLoading || (teamId && playersLoading)) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (playersError) {
+    return (
+      <View style={styles.center}>
+        <Text>Chyba načítania členov tímu: {playersError}</Text>
       </View>
     );
   }

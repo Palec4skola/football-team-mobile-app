@@ -1,27 +1,28 @@
 // app/team/match-detail.tsx
-import React, { useEffect, useState, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { useSearchParams } from 'expo-router/build/hooks';
 import { useRouter } from 'expo-router';
+import { useSearchParams } from 'expo-router/build/hooks';
 import {
+  addDoc,
+  collection,
   doc,
   getDoc,
-  collection,
-  query,
-  where,
   getDocs,
-  addDoc,
+  query,
   updateDoc,
+  where,
 } from 'firebase/firestore';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { auth, db } from '../../firebase';
+import { useTeamPlayers } from '../../hooks/useTeamPlayers';
 
 type Match = {
   id: string;
@@ -53,7 +54,8 @@ export default function MatchDetailScreen() {
   const teamId = params.get('teamId');
 
   const [match, setMatch] = useState<Match | null>(null);
-  const [players, setPlayers] = useState<Player[]>([]);
+  // Use hook for players
+  const { players, loading: playersLoading, error: playersError } = useTeamPlayers(teamId);
   const [attendances, setAttendances] = useState<Attendance[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUserRoles, setCurrentUserRoles] = useState<string[]>([]);
@@ -107,11 +109,11 @@ export default function MatchDetailScreen() {
     const loadData = async () => {
       setLoading(true);
       try {
-        // 1) tréning
+        // 1) zápas
         const matchRef = doc(db, 'matches', matchId);
         const matchSnap = await getDoc(matchRef);
         if (!matchSnap.exists()) {
-          Alert.alert('Chyba', 'Tréning nebol nájdený');
+          Alert.alert('Chyba', 'Zápas nebol nájdený');
           router.back();
           return;
         }
@@ -121,19 +123,7 @@ export default function MatchDetailScreen() {
           ...(matchData as any),
         });
 
-        // 2) hráči tímu
-        const playersQ = query(
-          collection(db, 'users'),
-          where('teamId', '==', teamId)
-        );
-        const playersSnap = await getDocs(playersQ);
-        const playersList: Player[] = playersSnap.docs.map((d) => ({
-          id: d.id,
-          ...(d.data() as any),
-        }));
-        setPlayers(playersList);
-
-        // 3) attendance pre daný tréning
+        // 2) attendance pre daný zápas
         const attQ = query(
           collection(db, 'attendances'),
           where('matchId', '==', matchId),
@@ -146,7 +136,7 @@ export default function MatchDetailScreen() {
         }));
         setAttendances(attList);
       } catch (e: any) {
-        Alert.alert('Chyba', 'Nepodarilo sa načítať údaje o tréningu');
+        Alert.alert('Chyba', 'Nepodarilo sa načítať údaje o zápase');
         console.log(e);
       } finally {
         setLoading(false);
@@ -197,10 +187,18 @@ export default function MatchDetailScreen() {
     return 'Neurčené';
   };
 
-  if (loading || !match) {
+  if (loading || playersLoading || !match) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (playersError) {
+    return (
+      <View style={styles.center}>
+        <Text>Chyba načítania hráčov: {playersError}</Text>
       </View>
     );
   }

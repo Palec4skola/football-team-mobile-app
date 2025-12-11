@@ -3,13 +3,13 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-
+import {PaperProvider} from 'react-native-paper';
 // (nepotrebuješ anchor, môžeme ho odstrániť)
 export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <PaperProvider>
       <Stack screenOptions={{ headerShown: false }}>
         {/* Login bude prvý po štarte aplikácie */}
         <Stack.Screen name="login" options={{ headerShown: false, title: 'Prihlásenie' }} />
@@ -25,6 +25,6 @@ export default function RootLayout() {
       </Stack>
 
       <StatusBar style="auto" />
-    </ThemeProvider>
+    </PaperProvider>
   );
 }
