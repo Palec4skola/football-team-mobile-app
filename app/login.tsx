@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert } from 'react-native';
+import { View, Alert } from 'react-native';
+import { TextInput, Text, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { auth, db } from '../firebase'; // uprav podľa cesty
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -77,7 +78,9 @@ export default function LoginScreen() {
         onChangeText={setPassword}
       />
 
-      <Button title="Prihlásiť sa" onPress={handleLogin} />
+      <Button onPress={handleLogin} >
+        <Text>Prihlásiť sa</Text>
+      </Button>
 
       <View style={{ marginTop: 20, alignItems: 'center' }}>
         <Text>Nemáš účet?</Text>

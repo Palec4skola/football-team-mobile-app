@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
   Modal,
-  TextInput,
-  Button,
   StyleSheet,
   ActivityIndicator,
   Alert,
-  TouchableOpacity,
 } from 'react-native';
+import { Text, TextInput, Button, Card } from 'react-native-paper';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../../firebase';
 import { useSearchParams } from 'expo-router/build/hooks';
@@ -185,23 +181,23 @@ export default function PlayerProfile() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <Card style={styles.center}>
         <ActivityIndicator size="large" />
-      </View>
+      </Card>
     );
   }
 
   if (!player) {
     return (
-      <View style={styles.center}>
+      <Card style={styles.center}>
         <Text>Žiadne údaje o hráčovi.</Text>
-      </View>
+      </Card>
     );
   }
 
   // Výpis fyzických a kondičných štatistík s možnosťou editácie, viditeľný len pre trénera
   const renderPhysicalStats = () => (
-  <View style={{ marginTop: 20 }}>
+  <Card style={{ marginTop: 20 }}>
     <Text style={{ fontWeight: 'bold', marginBottom: 10 }}>Fyzické a kondičné štatistiky</Text>
     {[
       { key: 'height', label: 'Výška (cm)' },
@@ -210,23 +206,23 @@ export default function PlayerProfile() {
       { key: 'VO2max', label: 'VO2 max' },
       { key: 'maxSpeed', label: 'Najvyššia rýchlosť' },
     ].map(({ key, label }) => (
-      <View key={key} style={styles.statRow}>
+      <Card key={key} style={styles.statRow}>
         <Text style={styles.statLabel}>
           {label}: {player[key] != null ? player[key] : '---'}
         </Text>
         {/* Ikonka pera je viditeľná a klikateľná len pre trénera */}
         {isCoach && (
-          <TouchableOpacity onPress={() => openEditModal(key)}>
+          <Button onPress={() => openEditModal(key)}>
             <Ionicons name="pencil" size={22} color="#007AFF" />
-          </TouchableOpacity>
+          </Button>
         )}
-      </View>
+      </Card>
     ))}
-  </View>
+  </Card>
 );
 
   return (
-    <View style={styles.container}>
+    <Card style={styles.container}>
       <Text>Meno: {player?.firstName || '---'}</Text>
       <Text>Priezvisko: {player?.lastName || '---'}</Text>
       <Text>Email: {player?.email}</Text>
@@ -245,8 +241,8 @@ export default function PlayerProfile() {
             })()}
           </Text>
 
-          <View style={styles.roleButtonsContainer}>
-            <TouchableOpacity
+          <Card style={styles.roleButtonsContainer}>
+            <Button
               style={[
                 styles.roleButton,
                 selectedRoles.includes('player') && styles.roleButtonSelected,
@@ -261,9 +257,9 @@ export default function PlayerProfile() {
               >
                 Hráč
               </Text>
-            </TouchableOpacity>
+            </Button>
 
-            <TouchableOpacity
+            <Button
               style={[
                 styles.roleButton,
                 selectedRoles.includes('coach') && styles.roleButtonSelected,
@@ -278,12 +274,12 @@ export default function PlayerProfile() {
               >
                 Tréner
               </Text>
-            </TouchableOpacity>
-          </View>
+            </Button>
+          </Card>
 
-          <TouchableOpacity style={styles.saveButton} onPress={handleUpdateRoles}>
+          <Button style={styles.saveButton} onPress={handleUpdateRoles}>
             <Text style={styles.saveButtonText}>Uložiť roly</Text>
-          </TouchableOpacity>
+          </Button>
 
           {renderPhysicalStats()}
         </>
@@ -303,8 +299,8 @@ export default function PlayerProfile() {
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modalContent}>
+        <Card style={styles.modalBackdrop}>
+          <Card style={styles.modalContent}>
             <Text style={{ marginBottom: 10 }}>
               Zadaj novú hodnotu pre {editingStatKey}
             </Text>
@@ -315,22 +311,22 @@ export default function PlayerProfile() {
               keyboardType="numeric"
               autoFocus
             />
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Button title="Zrušiť" onPress={() => setModalVisible(false)} />
-              <Button title="Uložiť" onPress={saveStatValue} />
-            </View>
-          </View>
-        </View>
+            <Card style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Button onPress={() => setModalVisible(false)}> Zrušiť</Button>
+              <Button onPress={saveStatValue} > Uložiť</Button>
+            </Card>
+          </Card>
+        </Card>
       </Modal>
       {isCoach && (
-        <TouchableOpacity
+        <Button
           style={[styles.saveButton, { backgroundColor: '#d9534f', marginTop: 30 }]}
           onPress={handleRemoveFromTeam}
         >
           <Text style={styles.saveButtonText}>Odstrániť hráča z tímu</Text>
-        </TouchableOpacity>
+        </Button>
       )}
-    </View>
+    </Card>
   );
 }
 

@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
-  TextInput,
-  Button,
   StyleSheet,
   Alert,
   Platform,
-  TouchableOpacity,
 } from 'react-native';
+import {Button, Text, TextInput} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -74,9 +71,9 @@ export default function CreateTraining() {
       />
 
       <Text style={styles.label}>Dátum tréningu</Text>
-      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePickerButton}>
+      <Button onPress={() => setShowDatePicker(true)} style={styles.datePickerButton}>
         <Text>{date.toLocaleDateString()}</Text>
-      </TouchableOpacity>
+      </Button>
       {showDatePicker && (
         <DateTimePicker
           value={date}
@@ -96,7 +93,9 @@ export default function CreateTraining() {
         numberOfLines={4}
       />
 
-      <Button title={loading ? 'Ukladám...' : 'Pridať tréning'} onPress={handleAddTraining} disabled={loading} />
+      <Button onPress={handleAddTraining} disabled={loading}>
+        <Text>{loading ? 'Pridávam...' : 'Pridať tréning'}</Text>
+      </Button>
     </View>
   );
 }

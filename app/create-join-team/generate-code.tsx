@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Button, Alert } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';  // uprav podľa cesty
 import { useSearchParams } from 'expo-router/build/hooks';
+import { Button, Text } from 'react-native-paper';
 
 // Funkcia na generovanie unikátneho 4-miestneho kódu (A-Z, 0-9)
 function generateCode() {
@@ -53,7 +54,9 @@ export default function GenerateCode() {
     <View style={styles.container}>
       <Text style={styles.title}>Vygeneruj pozývací kód tímu</Text>
       <Text style={styles.code}>{code}</Text>
-      <Button title="Uložiť a hotovo" onPress={handleSaveCode} />
+      <Button onPress={handleSaveCode}>
+        <Text>Uložiť kód</Text>
+      </Button>
     </View>
   );
 }

@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
+import {Button , Text} from 'react-native-paper';
 
 export default function ChooseTeamAction() {
   const router = useRouter();
@@ -9,19 +10,19 @@ export default function ChooseTeamAction() {
     <View style={styles.container}>
       <Text style={styles.title}>Čo chceš urobiť?</Text>
       
-      <TouchableOpacity
+      <Button
         style={styles.button}
         onPress={() => router.push('./join-team')}
       >
         <Text style={styles.buttonText}>Pridať sa do tímu</Text>
-      </TouchableOpacity>
+      </Button>
 
-      <TouchableOpacity
+      <Button
         style={styles.button}
         onPress={() => router.push('../create-join-team/create-team')}
       >
         <Text style={styles.buttonText}>Vytvoriť nový tím</Text>
-      </TouchableOpacity>
+      </Button>
     </View>
   );
 }

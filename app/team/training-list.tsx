@@ -1,77 +1,92 @@
-import React, { useEffect, useState } from 'react';
-import {
-    View,
-    Text,
-    StyleSheet,
-    FlatList,   
-    TouchableOpacity,
-    ActivityIndicator,
-} from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSearchParams } from 'expo-router/build/hooks';
-import { useTeamCollection } from "../../hooks/useTeamCollection";
-import { useUserRole } from "../../hooks/useUserRole";
+import React from 'react';
+import {
+    ActivityIndicator,
+    FlatList,
+    StyleSheet,
+    View,
+} from 'react-native';
+import { Button, Card, Text } from 'react-native-paper';
+import { useTeamCollection } from '../../hooks/useTeamCollection';
+import { useUserRole } from '../../hooks/useUserRole';
 
 export default function TrainingListScreen() {
-    const router = useRouter();
-    const params = useSearchParams();
-    const teamId = params.get("teamId");
+  const router = useRouter();
+  const params = useSearchParams();
+  const teamId = params.get('teamId');
 
-    const { items: trainings, loadingItems } = useTeamCollection("trainings", teamId);
-    const { isCoach, loadingRole } = useUserRole();
+  const { items: trainings, loadingItems } = useTeamCollection('trainings', teamId);
+  const { isCoach, loadingRole } = useUserRole();
 
-    if (loadingItems || loadingRole) {
-        return <ActivityIndicator />;
-    }
+  if (loadingItems || loadingRole) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
+  const renderTrainingItem = ({ item }: { item: any }) => {
+    const dateText =
+      item.date?.toDate ? item.date.toDate().toLocaleDateString() : item.date ?? '---';
 
     return (
-        <View style={styles.container}>
-            {isCoach && (
-                <TouchableOpacity
-                    style={styles.addButton}
-                    onPress={() => router.push({ pathname: '/team/create-training', params: { teamId } })}
-                >
-                    <Text style={styles.addButtonText}>Vytvoriť tréning</Text>
-                </TouchableOpacity>
-            )}
-
-            {trainings.length === 0 ? (
-                <Text>Žiadne tréningy zatiaľ.</Text>
-            ) : (
-                <FlatList
-                    data={trainings}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity 
-                        style={styles.trainingItem}
-                        onPress={()=> router.push({pathname: '/team/training-detail', params: { teamId, trainingId: item.id }})}>
-                            <Text style={styles.trainingName}>{item.name}</Text>
-                            <Text>Dátum: {item.date?.toDate ? item.date.toDate().toLocaleDateString() : item.date}</Text>
-                            <Text>Popis: {item.description}</Text>
-                        </TouchableOpacity>
-                    )}
-                />
-            )}
-        </View>
+      <Card
+        style={styles.card}
+        onPress={() =>
+          router.push({
+            pathname: '/team/training-detail',
+            params: { teamId, trainingId: item.id },
+          })
+        }
+      >
+        <Card.Title title={item.name} />
+        <Card.Content>
+          <Text>Dátum: {dateText}</Text>
+          {item.description ? <Text>Popis: {item.description}</Text> : null}
+        </Card.Content>
+      </Card>
     );
+  };
+
+  return (
+    <View style={styles.container}>
+      {isCoach && (
+        <Button
+          mode="contained"
+          onPress={() =>
+            router.push({ pathname: '/team/create-training', params: { teamId } })
+          }
+          style={styles.addButton}
+        >
+          Vytvoriť tréning
+        </Button>
+      )}
+
+      {trainings.length === 0 ? (
+        <Text>Žiadne tréningy zatiaľ.</Text>
+      ) : (
+        <FlatList
+          data={trainings}
+          keyExtractor={(item) => item.id}
+          renderItem={renderTrainingItem}
+          contentContainerStyle={{ paddingBottom: 16 }}
+        />
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20 },
-    center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    addButton: {
-        backgroundColor: '#007AFF',
-        padding: 12,
-        borderRadius: 8,
-        marginBottom: 15,
-        alignItems: 'center',
-    },
-    addButtonText: { color: 'white', fontWeight: '600', fontSize: 16 },
-    trainingItem: {
-        marginBottom: 15,
-        padding: 15,
-        backgroundColor: '#f2f2f2',
-        borderRadius: 8,
-    },
-    trainingName: { fontSize: 18, fontWeight: 'bold' },
+  container: { flex: 1, paddingTop: 16, backgroundColor: '#f5f5f5' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  addButton: {
+    marginHorizontal: 16,
+    marginBottom: 8,
+  },
+  card: {
+    marginHorizontal: 16,
+    marginVertical: 8,
+  },
 });

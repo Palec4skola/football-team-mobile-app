@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
-  TextInput,
-  Button,
   StyleSheet,
   Alert,
   Platform,
-  TouchableOpacity,
 } from 'react-native';
+import {Button, Text, TextInput} from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -89,12 +86,12 @@ export default function CreateMatch() {
       />
 
       <Text style={styles.label}>Dátum zápasu</Text>
-      <TouchableOpacity
+      <Button
         onPress={() => setShowDatePicker(true)}
         style={styles.datePickerButton}
       >
         <Text>{date.toLocaleDateString()}</Text>
-      </TouchableOpacity>
+      </Button>
       {showDatePicker && (
         <DateTimePicker
           value={date}
@@ -113,10 +110,11 @@ export default function CreateMatch() {
       />
 
       <Button
-        title={loading ? 'Ukladám...' : 'Pridať zápas'}
         onPress={handleAddMatch}
         disabled={loading}
-      />
+      >
+        <Text>{loading ? 'Pridávam...' : 'Pridať zápas'}</Text>
+      </Button>
     </View>
   );
 }

@@ -2,13 +2,12 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ActivityIndicator,
   FlatList,
-  TouchableOpacity,
   Alert,
 } from 'react-native';
+import { Text, Button } from 'react-native-paper';
 import { useSearchParams } from 'expo-router/build/hooks';
 import { useRouter } from 'expo-router';
 import {
@@ -244,7 +243,7 @@ export default function TrainingDetailScreen() {
 
               {canEditThisRow && (
                 <View style={styles.buttonsRow}>
-                  <TouchableOpacity
+                  <Button
                     style={[
                       styles.statusButton,
                       statusText === 'Príde' && styles.statusYes,
@@ -252,8 +251,8 @@ export default function TrainingDetailScreen() {
                     onPress={() => updateAttendance(item.id, 'yes')}
                   >
                     <Text style={styles.statusButtonText}>Prídem</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
+                  </Button>
+                  <Button
                     style={[
                       styles.statusButton,
                       statusText === 'Nepríde' && styles.statusNo,
@@ -261,7 +260,7 @@ export default function TrainingDetailScreen() {
                     onPress={() => updateAttendance(item.id, 'no')}
                   >
                     <Text style={styles.statusButtonText}>Neprídem</Text>
-                  </TouchableOpacity>
+                  </Button>
                 </View>
               )}
             </View>

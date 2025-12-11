@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
     View,
-    Text,
     StyleSheet,
     FlatList,   
-    TouchableOpacity,
     ActivityIndicator,
 } from 'react-native';
+import { Text, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useSearchParams } from 'expo-router/build/hooks';
 import { useTeamCollection } from "../../hooks/useTeamCollection";
@@ -28,12 +27,12 @@ export default function MatchesScreen() {
     return (
         <View style={styles.container}>
             {isCoach && (
-                <TouchableOpacity
+                <Button
                     style={styles.addButton}
                     onPress={() => router.push({ pathname: '/team/create-match', params: { teamId } })}
                 >
                     <Text style={styles.addButtonText}>Pridať zápas</Text>
-                </TouchableOpacity>
+                </Button>
             )}
 
             {matches.length === 0 ? (
@@ -43,12 +42,12 @@ export default function MatchesScreen() {
                     data={matches}
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
-                        <TouchableOpacity style={styles.matchItem}
+                        <Button style={styles.matchItem}
                         onPress={()=> router.push({pathname: '/team/match-detail', params: { teamId, matchId: item.id }})}>
                             <Text style={styles.matchName}>{item.opponent}</Text>
                             <Text>Dátum: {item.date?.toDate ? item.date.toDate().toLocaleDateString() : item.date}</Text>
                             <Text>Miesto: {item.place}</Text>
-                        </TouchableOpacity>
+                        </Button>
                     )}
                 />
             )}

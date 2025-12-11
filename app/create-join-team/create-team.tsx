@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet,TouchableOpacity } from 'react-native';
+import { View, TextInput, Alert, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { db, auth } from '../../firebase';
 import { collection, addDoc , updateDoc, doc } from 'firebase/firestore';
+import {Button, Text} from 'react-native-paper';
 
 export default function CreateTeam() {
   const router = useRouter();
@@ -59,7 +60,7 @@ export default function CreateTeam() {
         onChangeText={setCountry}
       />
       <Text>Vyberte úroveň tímu</Text>
-      <TouchableOpacity
+      <Button
   style={[
     styles.checkboxContainer,
     level !== 'amateur' && styles.unchecked, // ak NIE je vybraný amatér, bude biely
@@ -74,9 +75,9 @@ export default function CreateTeam() {
   >
     Amatérsky
   </Text>
-</TouchableOpacity>
+</Button>
 
-<TouchableOpacity
+<Button
   style={[
     styles.checkboxContainer,
     level !== 'professional' && styles.unchecked,
@@ -91,9 +92,11 @@ export default function CreateTeam() {
   >
     Profesionálny
   </Text>
-</TouchableOpacity>
+</Button>
 
-      <Button title="Vytvoriť tím" onPress={handleCreateTeam} />
+      <Button onPress={handleCreateTeam}>
+        <Text>Vytvoriť tím</Text>
+      </Button>
     </View>
   );
 }

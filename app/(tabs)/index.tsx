@@ -2,8 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRouter } from 'expo-router';
 import { doc, getDoc } from 'firebase/firestore';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
 import { auth, db } from '../../firebase';
+import { Button, Text } from 'react-native-paper';
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -63,9 +64,9 @@ useEffect(() => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => router.push('/chat/chat-list')} style={{ marginRight: 12 }}>
+        <Button onPress={() => router.push('/chat/chat-list')} style={{ marginRight: 12 }}>
           <Ionicons name="chatbubbles-outline" size={28} color="#007AFF" />
-        </TouchableOpacity>
+        </Button>
       ),
     });
   }, [navigation, router]);
@@ -112,29 +113,29 @@ useEffect(() => {
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Profesionálny tím</Text>
         <Text style={{marginBottom: 16}}>Vitajte v profesionálnom režime!</Text>
-        <TouchableOpacity style={styles.section} onPress={() => router.push({
+        <Button style={styles.section} onPress={() => router.push({
         pathname:'/team/training-list',
         params: { teamId: teamId}
       })}>
           <Text style={styles.sectionTitle}>Tréningy</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.section} onPress={() => router.push({
+        </Button>
+        <Button style={styles.section} onPress={() => router.push({
         pathname: '/team/match-list',
         params: { teamId: teamId}
         })}>
           <Text style={styles.sectionTitle}>Zápasy</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.section} onPress={() => router.push({
+        </Button>
+        <Button style={styles.section} onPress={() => router.push({
           pathname: '/team/announcement',
         })}>
           <Text style={styles.sectionTitle}>Oznámenia</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.section} onPress={() => router.push({
+        </Button>
+        <Button style={styles.section} onPress={() => router.push({
           pathname: '/team/wellness',
           params: { teamId: teamId }
         })}>
           <Text style={styles.sectionTitle}>Wellness</Text>
-        </TouchableOpacity>
+        </Button>
         {/* Pridaj ďalšie tlačidlá podľa potreby */}
       </ScrollView>
     );
@@ -143,7 +144,7 @@ useEffect(() => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Domov</Text>
-      <TouchableOpacity 
+      <Button 
       style={styles.section}
       onPress={() => router.push({
         pathname:'/team/training-list',
@@ -152,8 +153,8 @@ useEffect(() => {
         <Text style={styles.sectionTitle}>Tréningy</Text>
         <Text>{nextActivity.type} - {nextActivity.date} o {nextActivity.time}</Text>
         <Text>Miesto: {nextActivity.place}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity 
+      </Button>
+      <Button 
       style={styles.section} 
       onPress={()=>router.push({
         pathname: '/team/match-list',
@@ -164,8 +165,8 @@ useEffect(() => {
         <Text>Zápas proti: {lastResult.opponent}</Text>
         <Text>Dátum: {lastResult.date}</Text>
         <Text>Výsledok: {lastResult.score} ({lastResult.result})</Text>
-      </TouchableOpacity  >
-      <TouchableOpacity style={styles.section} onPress={()=>router.push({
+      </Button  >
+      <Button style={styles.section} onPress={()=>router.push({
           pathname: '/team/announcement',
         })}>
         <Text 
@@ -173,7 +174,7 @@ useEffect(() => {
         {announcements.map((msg, idx) => (
           <Text key={idx}>• {msg}</Text>
         ))}
-      </TouchableOpacity>
+      </Button>
     </ScrollView>
   );
   

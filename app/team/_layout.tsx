@@ -1,11 +1,10 @@
 import React from 'react';
-import { Stack, useRouter, useNavigation, usePathname } from 'expo-router';
+import { Stack, useRouter, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { TouchableOpacity } from 'react-native';
+import { Button } from 'react-native-paper';
 
 export default function TabsLayout() {
   const router = useRouter();
-  const navigation = useNavigation();
   const pathname = usePathname();
 
   const handleGoHome = () => {
@@ -24,14 +23,14 @@ export default function TabsLayout() {
         headerShown: true,
         headerLeft: () =>
           showBackArrow ? (
-            <TouchableOpacity onPress={handleGoHome} style={{ marginLeft: 16 }}>
+            <Button onPress={handleGoHome} style={{ marginLeft: 16 }}>
               <Ionicons name="arrow-back-outline" size={26} color="#007AFF" />
-            </TouchableOpacity>
+            </Button>
           ) : null,
         headerRight: () => (
-          <TouchableOpacity onPress={handleOpenChat} style={{ marginRight: 16 }}>
+          <Button onPress={handleOpenChat} style={{ marginRight: 16 }}>
             <Ionicons name="chatbubbles-outline" size={26} color="#007AFF" />
-          </TouchableOpacity>
+          </Button>
         ),
       }}
     >

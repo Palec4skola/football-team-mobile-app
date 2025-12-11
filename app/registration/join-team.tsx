@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
   TextInput,
-  TouchableOpacity,
   Alert,
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
+import { Button, Text } from 'react-native-paper';
+
 import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../../firebase'; // uprav podľa cesty
 import { useRouter } from 'expo-router';
@@ -71,9 +71,9 @@ export default function JoinTeam() {
       {isLoading ? (
         <ActivityIndicator size="large" style={{ marginTop: 20 }} />
       ) : (
-        <TouchableOpacity style={styles.button} onPress={handleJoin}>
+        <Button style={styles.button} onPress={handleJoin}>
           <Text style={styles.buttonText}>Pripojiť sa</Text>
-        </TouchableOpacity>
+        </Button>
       )}
     </View>
   );

@@ -3,10 +3,11 @@ import { useRouter } from 'expo-router';
 import { signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, View } from 'react-native';
 import profileStyles from '../../components/profileStyles';
 import { auth, db } from '../../firebase';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
+import {Text, Button} from 'react-native-paper';
 
   export default function Profile() {
     const router = useRouter();
@@ -94,15 +95,15 @@ import { useCurrentUser } from '../../hooks/useCurrentUser';
           ) : (
             <Text style={{ marginBottom: 16 }}>Používateľské údaje sa nenačítali.</Text>
           )}
-          <TouchableOpacity style={profileStyles.button} onPress={() => router.push('/create-join-team/create-team')}>
+          <Button style={profileStyles.button} onPress={() => router.push('/create-join-team/create-team')}>
             <Text style={profileStyles.buttonText}>Vytvoriť tím</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={profileStyles.button} onPress={() => router.push('/registration/join-team')}>
+          </Button>
+          <Button style={profileStyles.button} onPress={() => router.push('/registration/join-team')}>
             <Text style={profileStyles.buttonText}>Pridať sa do tímu</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[profileStyles.button, profileStyles.logoutButton]} onPress={handleLogout}>
+          </Button>
+          <Button style={[profileStyles.button, profileStyles.logoutButton]} onPress={handleLogout}>
             <Text style={[profileStyles.buttonText, profileStyles.logoutButtonText]}>Odhlásiť sa</Text>
-          </TouchableOpacity>
+          </Button>
         </View>
       </View>
     );

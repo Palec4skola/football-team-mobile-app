@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Button, Alert } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { auth, db } from '../../firebase'; // uprav podľa cesty
 import { doc, updateDoc } from 'firebase/firestore';
+import { Button, Text } from 'react-native-paper';
 
 export default function ChooseRole() {
   const router = useRouter();
@@ -36,21 +37,23 @@ export default function ChooseRole() {
     <View style={styles.container}>
       <Text style={styles.title}>Vyber svoje role</Text>
 
-      <TouchableOpacity
+      <Button
         style={[styles.checkboxContainer, isPlayer && styles.checked]}
         onPress={() => setIsPlayer(!isPlayer)}
       >
         <Text style={[styles.checkboxLabel, isPlayer && styles.checkedLabel]}>Hráč</Text>
-      </TouchableOpacity>
+      </Button>
 
-      <TouchableOpacity
+      <Button
         style={[styles.checkboxContainer, isCoach && styles.checked]}
         onPress={() => setIsCoach(!isCoach)}
       >
         <Text style={[styles.checkboxLabel, isCoach && styles.checkedLabel]}>Tréner</Text>
-      </TouchableOpacity>
+      </Button>
 
-      <Button title="Uložiť" onPress={handleSaveRoles} />
+      <Button onPress={handleSaveRoles} >
+        <Text>Uložiť role</Text>
+      </Button>
     </View>
   );
 }

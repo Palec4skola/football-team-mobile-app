@@ -1,13 +1,12 @@
 import { useRouter } from 'expo-router';
 import { doc, getDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
+import {Button, Text} from 'react-native-paper';
 import {
   ActivityIndicator,
   Alert,
   FlatList,
   StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import { auth, db } from '../../firebase'; // uprav podľa cesty
@@ -90,16 +89,16 @@ export default function TeamManagement() {
       <Text style={styles.title}>Správa tímu</Text>
 
       {isCoach && (
-        <TouchableOpacity style={styles.addButton} onPress={handleAddPlayer}>
+        <Button style={styles.addButton} onPress={handleAddPlayer}>
           <Text style={styles.addButtonText}>Pridať hráča</Text>
-        </TouchableOpacity>
+        </Button>
       )}
 
       <FlatList
         data={players}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
-        <TouchableOpacity 
+        <Button 
           style={styles.playerItem}
           onPress={() => router.push({
             pathname: '../team/player-profile',
@@ -117,7 +116,7 @@ export default function TeamManagement() {
             })()}
             {item.id === auth.currentUser?.uid ? ' (Ty)' : ''}
           </Text>
-        </TouchableOpacity>
+        </Button>
       )}
         ListEmptyComponent={<Text>Žiadny členovia tímu</Text>}
       />

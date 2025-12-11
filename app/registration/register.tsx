@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
+import { View, TextInput, Button, Alert } from 'react-native';
+import { Text } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 // Uprav cestu podľa tvojho projektu, napr. '@/firebase' alebo './firebase'
 import { auth, db } from '../../firebase';
