@@ -1,0 +1,97 @@
+import { StyleSheet } from 'react-native';
+
+const profileStyles = StyleSheet.create({
+  avatar: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    marginBottom: 16,
+    backgroundColor: '#e0e0e0',
+    alignSelf: 'center',
+  },
+  avatarPlaceholder: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    marginBottom: 16,
+    backgroundColor: '#e0e0e0',
+    alignSelf: 'center',
+  },
+  userName: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 4,
+    color: '#222',
+    textAlign: 'center',
+  },
+  userEmail: {
+    fontSize: 15,
+    color: '#666',
+    marginBottom: 2,
+    textAlign: 'center',
+  },
+  userTeam: {
+    fontSize: 15,
+    color: '#007AFF',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  screenBg: {
+    flex: 1,
+    backgroundColor: '#f2f4f8',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    paddingVertical: 36,
+    paddingHorizontal: 28,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    elevation: 4,
+    alignItems: 'center',
+    minWidth: 280,
+    width: '85%',
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginBottom: 32,
+    color: '#222',
+    letterSpacing: 0.5,
+  },
+  button: {
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    marginBottom: 18,
+    width: 200,
+    alignItems: 'center',
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '600',
+    letterSpacing: 0.2,
+  },
+  logoutButton: {
+    backgroundColor: '#fff',
+    borderWidth: 1.5,
+    borderColor: '#d9534f',
+    marginTop: 10,
+  },
+  logoutButtonText: {
+    color: '#d9534f',
+  },
+});
+
+export default profileStyles;

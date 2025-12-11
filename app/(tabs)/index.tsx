@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useLayoutEffect } from 'react';
-import { Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useRouter, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useRouter } from 'expo-router';
 import { doc, getDoc } from 'firebase/firestore';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { auth, db } from '../../firebase';
 
 export default function HomeScreen() {
@@ -11,6 +11,7 @@ export default function HomeScreen() {
   const [teamId, setTeamId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [teamLevel, setTeamLevel] = useState<string | null>(null); // 'professional' | 'amateur'
 
   
 useEffect(() => {
@@ -25,19 +26,38 @@ useEffect(() => {
     return unsubscribe;
   }, []);
   useEffect(() => {
-    async function fetchTeamId() {
+    async function fetchTeamIdAndLevel() {
       if (!userId) return;
       try {
         const id = await getTeamIdForUser(userId);
         setTeamId(id);
+        if (id) {
+          // Získaj level tímu z Firestore
+          const teamDocRef = doc(db, 'teams', id);
+          const teamDocSnap = await getDoc(teamDocRef);
+          if (teamDocSnap.exists()) {
+            const teamData = teamDocSnap.data();
+            // Oprava: zabezpečiť, že level je string
+            let level = teamData.level;
+            if (typeof level !== 'string' || !level) {
+              level = 'amateur';
+            }
+            setTeamLevel(level);
+          } else {
+            setTeamLevel('amateur');
+          }
+        } else {
+          setTeamLevel(null);
+        }
       } catch (error) {
-        console.error('Chyba načítania teamId:', error);
+        console.error('Chyba načítania teamId/level:', error);
         setTeamId(null);
+        setTeamLevel(null);
       } finally {
         setLoading(false);
       }
     }
-    fetchTeamId();
+    fetchTeamIdAndLevel();
   }, [userId]);
 
   useLayoutEffect(() => {
@@ -86,6 +106,40 @@ useEffect(() => {
     return null;
   }
 
+  // Ak je tím profesionálny, zobraz špeciálne menu
+  if (teamLevel === 'professional') {
+    return (
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>Profesionálny tím</Text>
+        <Text style={{marginBottom: 16}}>Vitajte v profesionálnom režime!</Text>
+        <TouchableOpacity style={styles.section} onPress={() => router.push({
+        pathname:'/team/training-list',
+        params: { teamId: teamId}
+      })}>
+          <Text style={styles.sectionTitle}>Tréningy</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.section} onPress={() => router.push({
+        pathname: '/team/match-list',
+        params: { teamId: teamId}
+        })}>
+          <Text style={styles.sectionTitle}>Zápasy</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.section} onPress={() => router.push({
+          pathname: '/team/announcement',
+        })}>
+          <Text style={styles.sectionTitle}>Oznámenia</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.section} onPress={() => router.push({
+          pathname: '/team/wellness',
+          params: { teamId: teamId }
+        })}>
+          <Text style={styles.sectionTitle}>Wellness</Text>
+        </TouchableOpacity>
+        {/* Pridaj ďalšie tlačidlá podľa potreby */}
+      </ScrollView>
+    );
+  }
+  // Amatérsky tím - pôvodné GUI
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Domov</Text>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, StyleSheet,TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { db, auth } from '../../firebase';
-import { collection, addDoc, serverTimestamp , updateDoc, doc } from 'firebase/firestore';
+import { collection, addDoc , updateDoc, doc } from 'firebase/firestore';
 
 export default function CreateTeam() {
   const router = useRouter();

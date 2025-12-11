@@ -20,7 +20,6 @@ export default function TeamManagement() {
   const [isCoach, setIsCoach] = useState(false);
   const [teamId, setTeamId] = useState<string | null>(null);
   const [players, setPlayers] = useState<any[]>([]);
-  const [teamName, setTeamName] = useState('');
 
 
   useEffect(() => {

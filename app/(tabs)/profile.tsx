@@ -1,31 +1,122 @@
-import React from 'react';
-import { View, Text, StyleSheet, Button, Alert } from 'react-native';
-import { auth } from '../../firebase'; // uprav cestu podľa projektu
-import { signOut } from 'firebase/auth';
+import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
+import { signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import React, { useState, useEffect } from 'react';
+import { ActivityIndicator, Alert, Image, Text, TouchableOpacity, View } from 'react-native';
+import profileStyles from '../../components/profileStyles';
+import { auth, db } from '../../firebase';
 
-export default function Profile() {
-  const router = useRouter();
+  export default function Profile() {
+    const router = useRouter();
+    const [user, setUser] = useState<any>(null);
+    const [teamName, setTeamName] = useState<string | null>(null);
+    const [teamList, setTeamList] = useState<{ id: string; name: string }[]>([]);
+    const [activeTeamId, setActiveTeamId] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      Alert.alert('Úspech', 'Boli ste odhlásený');
-      router.replace('/login'); // presmerovanie na login obrazovku
-    } catch (error: any) {
-      Alert.alert('Chyba', error.message);
-    }
-  };
+    useEffect(() => {
+      const fetchUser = async () => {
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+        try {
+          const userRef = doc(db, 'users', currentUser.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            const userData = userSnap.data();
+            setUser(userData);
+            // Ak má user teams (pole ID tímov), načítaj názvy všetkých tímov
+            const teamIds: string[] = userData.teams || (userData.teamId ? [userData.teamId] : []);
+            setActiveTeamId(teamIds.length > 0 ? teamIds[0] : null);
+            if (teamIds.length > 0) {
+              const teamPromises = teamIds.map(async (id) => {
+                const teamRef = doc(db, 'teams', id);
+                const teamSnap = await getDoc(teamRef);
+                if (teamSnap.exists()) {
+                  const teamData = teamSnap.data();
+                  return { id, name: teamData.name || id };
+                }
+                return { id, name: id };
+              });
+              const teams = await Promise.all(teamPromises);
+              setTeamList(teams);
+              // Nastav názov aktívneho tímu
+              const activeTeam = teams.find(t => t.id === teamIds[0]);
+              setTeamName(activeTeam ? activeTeam.name : null);
+            } else {
+              setTeamList([]);
+              setTeamName(null);
+            }
+          }
+        } catch (e) {
+          setTeamList([]);
+          setTeamName(null);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchUser();
+    }, []);
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Profil</Text>
-      <Button title="Odhlásiť sa" onPress={handleLogout} />
-    </View>
-  );
-}
+    const handleLogout = async () => {
+      try {
+        await signOut(auth);
+        Alert.alert('Úspech', 'Boli ste odhlásený');
+        router.replace('/login');
+      } catch (error: any) {
+        Alert.alert('Chyba', error.message);
+      }
+    };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  text: { fontSize: 20, fontWeight: '600', marginBottom: 20 },
-});
+    return (
+      <View style={profileStyles.screenBg}>
+        <View style={profileStyles.card}>
+          <Text style={profileStyles.title}>Profil</Text>
+          {loading ? (
+            <ActivityIndicator size="large" style={{ marginVertical: 24 }} />
+          ) : user ? (
+            <>
+              {user.photoURL ? (
+                <Image source={{ uri: user.photoURL }} style={profileStyles.avatar} />
+              ) : (
+                <View style={profileStyles.avatarPlaceholder} />
+              )}
+              <Text style={profileStyles.userName}>{user.firstName} {user.lastName}</Text>
+              <Text style={profileStyles.userEmail}>{user.email}</Text>
+              {teamList.length > 1 ? (
+                <View style={{ marginBottom: 12, width: '100%' }}>
+                  <Text style={[profileStyles.userTeam, { marginBottom: 4 }]}>Vyber tím:</Text>
+                  <Picker
+                    selectedValue={activeTeamId}
+                    style={{ backgroundColor: '#f2f2f2', borderRadius: 8, width: '100%' }}
+                    onValueChange={(itemValue) => {
+                      setActiveTeamId(itemValue);
+                      const selected = teamList.find(t => t.id === itemValue);
+                      setTeamName(selected ? selected.name : null);
+                    }}
+                  >
+                    {teamList.map(team => (
+                      <Picker.Item key={team.id} label={team.name} value={team.id} />
+                    ))}
+                  </Picker>
+                </View>
+              ) : teamName ? (
+                <Text style={profileStyles.userTeam}>Tím: {teamName}</Text>
+              ) : null}
+            </>
+          ) : (
+            <Text style={{ marginBottom: 16 }}>Používateľské údaje sa nenačítali.</Text>
+          )}
+          <TouchableOpacity style={profileStyles.button} onPress={() => router.push('/create-join-team/create-team')}>
+            <Text style={profileStyles.buttonText}>Vytvoriť tím</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={profileStyles.button} onPress={() => router.push('/registration/join-team')}>
+            <Text style={profileStyles.buttonText}>Pridať sa do tímu</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[profileStyles.button, profileStyles.logoutButton]} onPress={handleLogout}>
+            <Text style={[profileStyles.buttonText, profileStyles.logoutButtonText]}>Odhlásiť sa</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
