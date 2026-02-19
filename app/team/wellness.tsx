@@ -1,5 +1,6 @@
 import React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useRouter } from 'expo-router';
 
 // Ukážkové dáta hráčov a wellness indexu
 const players = [
@@ -11,6 +12,7 @@ const players = [
 ];
 
 export default function WellnessScreen() {
+  const router = useRouter();
   // Funkcia na zobrazenie farby podľa wellness indexu
   const getWellnessColor = (value: number) => {
     if (value >= 8) return '#4CAF50'; // zelená
@@ -20,6 +22,7 @@ export default function WellnessScreen() {
 
   return (
     <View style={styles.container}>
+      
       <Text style={styles.title}>Wellness hráčov</Text>
       <FlatList
         data={players}
@@ -34,7 +37,7 @@ export default function WellnessScreen() {
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={()=> router.push('./wellnessForm')}>
         <Text style={styles.buttonText}>Zadať nové wellness hodnoty</Text>
       </TouchableOpacity>
     </View>

@@ -1,26 +1,81 @@
-import React from 'react';
-import { Tabs, useRouter, usePathname } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { Button } from 'react-native-paper';
+import React, { useEffect } from "react";
+import { Tabs, useRouter, usePathname } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { Button, Menu, Text } from "react-native-paper";
+import { useState, useMemo } from "react";
+import { auth } from "@/firebase";
+import { useMyTeams } from "@/hooks/useMyTeams";
+import { userRepo } from "@/data/firebase/UserRepo";
+import { useActiveTeam } from "@/hooks/useActiveTeam";
 
 export default function TabsLayout() {
   const router = useRouter();
   const pathname = usePathname();
+  const [teamMenuOpen, setTeamMenuOpen] = useState(false);
+  const { teamId } = useActiveTeam();
+
+  const uid = auth.currentUser?.uid ?? null;
+  // console.log("Current user ID:", uid);
+  const { teams } = useMyTeams(uid);
+  // console.log(teamId);
+  const activeTeamId = teamId;
+  // console.log("Active team ID:", activeTeamId);
+
+  const activeTeamName = useMemo(() => {
+    if (!activeTeamId) return "Vybrať tím";
+    return (
+      teams?.find((t) => t.teamId === activeTeamId)?.teamName ?? "Vybrať tím"
+    );
+  }, [teams, activeTeamId]);
+
+  const switchTeam = async (teamId: string) => {
+    if (!uid) {
+      setTeamMenuOpen(false);
+      return;
+    }
+    await userRepo.setActiveTeamId(uid, teamId);
+    setTeamMenuOpen(false);
+    // console.log("Switched team, new active team ID:", teamId);
+  };
 
   const handleGoHome = () => {
-    router.push('..');
+    router.push("..");
   };
 
   const handleOpenChat = () => {
-    router.push('../chat/chat-list');
+    router.push("../chat/chat-list");
   };
 
-  const showBackArrow = pathname !== '..)';
-
+  const showBackArrow = pathname !== "..)";
+  console.log(teamMenuOpen);
   return (
     <Tabs
       screenOptions={{
         headerShown: true,
+        headerTitle: () => (
+          <Menu
+            visible={teamMenuOpen}
+            onDismiss={() => setTeamMenuOpen(false)}
+            anchor={
+              <Button
+                onPress={() =>
+                  requestAnimationFrame(() => setTeamMenuOpen((v) => !v))
+                }
+              >
+                <Text>{activeTeamName}</Text>
+                <Ionicons name="chevron-down" size={18} color="#007AFF" />
+              </Button>
+            }
+          >
+            {(teams ?? []).map((t) => (
+              <Menu.Item
+                key={t.teamId}
+                title={t.teamName}
+                onPress={() => switchTeam(t.teamId)}
+              />
+            ))}
+          </Menu>
+        ),
         headerLeft: () =>
           showBackArrow ? (
             <Button onPress={handleGoHome} style={{ marginLeft: 16 }}>
@@ -32,15 +87,15 @@ export default function TabsLayout() {
             <Ionicons name="chatbubbles-outline" size={26} color="#007AFF" />
           </Button>
         ),
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: "#007AFF",
+        tabBarInactiveTintColor: "gray",
         tabBarStyle: { height: 60, paddingBottom: 6 },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Domov',
+          title: "Domov",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
@@ -49,7 +104,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="calendar"
         options={{
-          title: 'Kalendár',
+          title: "Kalendár",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar-outline" size={size} color={color} />
           ),
@@ -58,7 +113,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="team"
         options={{
-          title: 'Tím',
+          title: "Tím",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="shirt-outline" size={size} color={color} />
           ),
@@ -67,7 +122,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profil',
+          title: "Profil",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-outline" size={size} color={color} />
           ),

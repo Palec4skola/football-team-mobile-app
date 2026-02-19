@@ -95,7 +95,7 @@ import {Text, Button} from 'react-native-paper';
           ) : (
             <Text style={{ marginBottom: 16 }}>Používateľské údaje sa nenačítali.</Text>
           )}
-          <Button style={profileStyles.button} onPress={() => router.push('/create-join-team/create-team')}>
+          <Button style={profileStyles.button} onPress={() => router.push('/teams/CreateTeamScreen')}>
             <Text style={profileStyles.buttonText}>Vytvoriť tím</Text>
           </Button>
           <Button style={profileStyles.button} onPress={() => router.push('/registration/join-team')}>
