@@ -92,6 +92,6 @@ const profileStyles = StyleSheet.create({
   logoutButtonText: {
     color: '#d9534f',
   },
-});
+});   
 
 export default profileStyles;

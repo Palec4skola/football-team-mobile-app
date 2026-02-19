@@ -13,7 +13,6 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const { loading, teamId, teamLevel } = useActiveTeam();
-  console.log("HomeScreen - active team ID:", teamId);
   // header button (chat)
   useLayoutEffect(() => {
     navigation.setOptions({

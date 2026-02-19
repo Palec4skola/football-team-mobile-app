@@ -10,16 +10,13 @@ import { styles } from "../../styles/team.styles";
 
 export default function TeamManagement() {
   const router = useRouter();
-
   const { isLoading, isCoach, teamId, errorText } = useTeamManagementAccess();
-  console.log("TeamManagement - team ID:", teamId);
 
   const {
     players,
     loading: playersLoading,
     error: playersError,
   } = useTeamPlayers(teamId);
-  console.log("TeamManagement - players:", players);
 
   const handleAddPlayer = () => {
     router.push({
@@ -80,7 +77,7 @@ export default function TeamManagement() {
             onPress={() =>
               router.push({
                 pathname: "../team/player-profile",
-                params: { playerId: item.id },
+                params: { playerId: item.id, teamId: teamId },
               })
             }
           />

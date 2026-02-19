@@ -7,19 +7,18 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Button, Text } from "react-native-paper";
-
 import {
   collection,
   query,
   where,
   getDocs,
-  setDoc,
   getDoc,
   doc,
-  serverTimestamp,
 } from "firebase/firestore";
 import { auth, db } from "../../firebase"; // uprav podľa cesty
 import { useRouter } from "expo-router";
+import { userRepo } from "@/data/firebase/UserRepo";
+import { teamRepo } from "@/data/firebase/TeamRepo";
 
 export default function JoinTeam() {
   const [code, setCode] = useState("");
@@ -57,39 +56,21 @@ export default function JoinTeam() {
 
       const teamDoc = snapshot.docs[0];
       const teamId = teamDoc.id;
+      const teamName = teamDoc.data().name;
       const uid = auth.currentUser.uid;
 
       // 1) Zápis členstva do tímu
-      const memberRef = doc(db, "teams", teamId, "members", uid);
       const userRef = doc(db, "users", uid);
       const userSnap = await getDoc(userRef);
       const userData = userSnap.exists() ? userSnap.data() : {};
       const firstName = userData.firstName ?? "";
       const lastName = userData.lastName ?? "";
       const photoURL = userData.photoURL ?? "";
-      await setDoc(
-        memberRef,
-        {
-          roles: ["player"],
-          firstName,
-          lastName,
-          photoURL,
-          joinedAt: serverTimestamp(),
-        },
-        { merge: true }, // ak už existuje, len zmerge
-      );
-
-      // 2) (Voliteľné) cache membership pod userom
-      const userMembershipRef = doc(db, "users", uid, "memberships", teamId);
-      await setDoc(
-        userMembershipRef,
-        {
-          role: "player",
-          joinedAt: serverTimestamp(),
-        },
-        { merge: true },
-      );
-
+    
+      teamRepo.addMember(teamId, uid, ["player"], firstName, lastName, photoURL);
+      // 2) Zápis členstva do užívateľa
+      userRepo.addMembership(uid,teamId,teamName, ["player"]);
+      
       Alert.alert("Úspech", "Úspešne si sa pridal do tímu");
       router.replace("/(tabs)/team");
     } catch (error: any) {

@@ -15,7 +15,6 @@ export function useTeamPlayers(teamId: string | null) {
   const [players, setPlayers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  console.log("useTeamPlayers - team ID:", teamId);
   useEffect(() => {
     let cancelled = false;
 
@@ -58,7 +57,6 @@ export function useTeamPlayers(teamId: string | null) {
       cancelled = true;
     };
   }, [teamId]);
-  console.log("useTeamPlayers - players:", players);
 
   return { players, loading, error };
 }

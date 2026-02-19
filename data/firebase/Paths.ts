@@ -3,6 +3,8 @@ export const paths = {
   team: (teamId: string) => `teams/${teamId}`,
   members: (teamId: string) => `teams/${teamId}/members`,
   member: (teamId: string, uid: string) => `teams/${teamId}/members/${uid}`,
+  memberships: (userId: string) => `users/${userId}/memberships`,
+  membership: (userId: string, teamId: string) => `users/${userId}/memberships/${teamId}`,
 
   trainings: (teamId: string) => `teams/${teamId}/trainings`,
   training: (teamId: string, trainingId: string) =>

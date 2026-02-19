@@ -17,7 +17,6 @@ export function useTeamManagementAccess(): Result {
   const [isCoach, setIsCoach] = useState(false);
   const [teamId, setTeamId] = useState<string | null>(null);
   const [errorText, setErrorText] = useState<string | null>(null);
-  console.log("useTeamManagementAccess - initializing");
 
   useEffect(() => {
     const user = auth.currentUser;

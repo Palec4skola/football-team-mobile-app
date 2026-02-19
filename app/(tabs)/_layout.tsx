@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import { Tabs, useRouter, usePathname } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Button, Menu, Text } from "react-native-paper";
@@ -15,11 +14,8 @@ export default function TabsLayout() {
   const { teamId } = useActiveTeam();
 
   const uid = auth.currentUser?.uid ?? null;
-  // console.log("Current user ID:", uid);
   const { teams } = useMyTeams(uid);
-  // console.log(teamId);
   const activeTeamId = teamId;
-  // console.log("Active team ID:", activeTeamId);
 
   const activeTeamName = useMemo(() => {
     if (!activeTeamId) return "Vybrať tím";
@@ -35,7 +31,6 @@ export default function TabsLayout() {
     }
     await userRepo.setActiveTeamId(uid, teamId);
     setTeamMenuOpen(false);
-    // console.log("Switched team, new active team ID:", teamId);
   };
 
   const handleGoHome = () => {
@@ -47,7 +42,6 @@ export default function TabsLayout() {
   };
 
   const showBackArrow = pathname !== "..)";
-  console.log(teamMenuOpen);
   return (
     <Tabs
       screenOptions={{

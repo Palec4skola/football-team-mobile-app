@@ -1,15 +1,16 @@
-import {paths} from "../firebase/Paths"
+import { paths } from "../firebase/Paths";
 import {
   doc,
   getDoc,
   setDoc,
   serverTimestamp,
   addDoc,
+  deleteDoc,
   collection,
   getDocs,
   where,
   query,
-    updateDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase";
 export const teamRepo = {
@@ -69,8 +70,34 @@ export const teamRepo = {
     await updateDoc(doc(db, `users/${uid}`), { activeTeamId: teamId });
   },
   async getTeamLevel(teamId: string) {
-    const teamDocRef = doc(db, 'teams', teamId);
+    const teamDocRef = doc(db, "teams", teamId);
     const teamDocSnap = await getDoc(teamDocRef);
     return teamDocSnap.data()?.level;
-  }
+  },
+  async removeMember(teamId: string | null, userId: string) {
+    if (!teamId) return;
+    await deleteDoc(doc(db, paths.member(teamId, userId)));
+  },
+  async addMember(
+    teamId: string,
+    userId: string,
+    roles: string[],
+    firstName: string,
+    lastName: string,
+    photoURL: string,
+  ) {
+    const memberRef = doc(db, "teams", teamId, "members", userId);
+
+    await setDoc(
+      memberRef,
+      {
+        roles: roles,
+        firstName,
+        lastName,
+        photoURL,
+        joinedAt: serverTimestamp(),
+      },
+      { merge: true }, // ak už existuje, len zmerge
+    );
+  },
 };
