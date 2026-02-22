@@ -11,8 +11,24 @@ import {
   where,
   query,
   updateDoc,
+  onSnapshot,
+  Unsubscribe,
 } from "firebase/firestore";
 import { db } from "../../firebase";
+
+export type TeamMember = {
+  id: string; // userId
+  firstName?: string;
+  lastName?: string;
+  photoURL?: string;
+  roles?: string[]; // roly v TEAME
+};
+
+export type TeamMembership = {
+  id: string; // userId
+  roles?: string[];
+};
+
 export const teamRepo = {
   async getTeam(teamId: string) {
     const snap = await getDoc(doc(db, paths.team(teamId)));
@@ -69,15 +85,18 @@ export const teamRepo = {
 
     await updateDoc(doc(db, `users/${uid}`), { activeTeamId: teamId });
   },
+
   async getTeamLevel(teamId: string) {
     const teamDocRef = doc(db, "teams", teamId);
     const teamDocSnap = await getDoc(teamDocRef);
     return teamDocSnap.data()?.level;
   },
+
   async removeMember(teamId: string | null, userId: string) {
     if (!teamId) return;
     await deleteDoc(doc(db, paths.member(teamId, userId)));
   },
+
   async addMember(
     teamId: string,
     userId: string,
@@ -99,5 +118,32 @@ export const teamRepo = {
       },
       { merge: true }, // ak už existuje, len zmerge
     );
+  },
+
+  async setMemberRoles(teamId: string, userId: string, roles: string[]) {
+    const ref = doc(db, "teams", teamId, "members", userId);
+    await updateDoc(ref, { roles });
+  },
+  
+  watchMembers(
+    teamId: string,
+    cb: (members: TeamMember[]) => void,
+  ): Unsubscribe {
+    // Predpoklad: v members máš aj meno. Ak nie, nižšie poviem alternatívu.
+    const colRef = collection(db, "teams", teamId, "members");
+    return onSnapshot(colRef, (snap) => {
+      cb(snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })));
+    });
+  },
+
+  watchMyMembership(
+    teamId: string,
+    userId: string,
+    cb: (m: TeamMembership | null) => void,
+  ): Unsubscribe {
+    const ref = doc(db, "teams", teamId, "members", userId);
+    return onSnapshot(ref, (snap) => {
+      cb(snap.exists() ? { id: snap.id, ...(snap.data() as any) } : null);
+    });
   },
 };

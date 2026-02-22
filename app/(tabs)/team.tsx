@@ -1,11 +1,10 @@
-import { TeamPlayerRow } from "@/components/team/teamPlayerRow";
+import { PlayersTable } from "@/components/team/playersTable";
 import { useRouter } from "expo-router";
 import React from "react";
-import { ActivityIndicator, FlatList, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { Button, Text } from "react-native-paper";
-import { auth } from "../../firebase";
 import { useTeamManagementAccess } from "../../hooks/useTeamManagementAccess";
-import { useTeamPlayers } from "../../hooks/useTeamPlayers";
+import { useTeamMembers } from "../../hooks/useTeamMembers";
 import { styles } from "../../styles/team.styles";
 
 export default function TeamManagement() {
@@ -13,10 +12,10 @@ export default function TeamManagement() {
   const { isLoading, isCoach, teamId, errorText } = useTeamManagementAccess();
 
   const {
-    players,
-    loading: playersLoading,
-    error: playersError,
-  } = useTeamPlayers(teamId);
+    members,
+    loading: loading,
+    error: error,
+  } = useTeamMembers(teamId);
 
   const handleAddPlayer = () => {
     router.push({
@@ -24,8 +23,14 @@ export default function TeamManagement() {
       params: { teamId },
     });
   };
+  const handlePressPlayer = (playerId: string) => {
+    router.push({
+      pathname: "../team/player-profile",
+      params: { playerId, teamId },
+    });
+  };
 
-  if (isLoading || (teamId && playersLoading)) {
+  if (isLoading || (teamId && loading)) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" />
@@ -41,10 +46,10 @@ export default function TeamManagement() {
     );
   }
 
-  if (playersError) {
+  if (error) {
     return (
       <View style={styles.center}>
-        <Text>Chyba načítania členov tímu: {playersError}</Text>
+        <Text>Chyba načítania členov tímu: {error}</Text>
       </View>
     );
   }
@@ -66,24 +71,7 @@ export default function TeamManagement() {
           <Text style={styles.addButtonText}>Pridať hráča</Text>
         </Button>
       )}
-
-      <FlatList
-        data={players}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TeamPlayerRow
-            player={item}
-            isMe={item.id === auth.currentUser?.uid}
-            onPress={() =>
-              router.push({
-                pathname: "../team/player-profile",
-                params: { playerId: item.id, teamId: teamId },
-              })
-            }
-          />
-        )}
-        ListEmptyComponent={<Text>Žiadni členovia tímu</Text>}
-      />
+      <PlayersTable members={members} onPressPlayer={handlePressPlayer} />
     </View>
   );
 }

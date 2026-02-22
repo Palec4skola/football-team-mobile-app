@@ -11,8 +11,8 @@ type TeamMember = {
   joinedAt?: any;
 };
 
-export function useTeamPlayers(teamId: string | null) {
-  const [players, setPlayers] = useState<TeamMember[]>([]);
+export function useTeamMembers(teamId: string | null) {
+  const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
@@ -20,7 +20,7 @@ export function useTeamPlayers(teamId: string | null) {
 
     async function fetchMembers() {
       if (!teamId) {
-        setPlayers([]);
+        setMembers([]);
         setLoading(false);
         return;
       }
@@ -39,12 +39,12 @@ export function useTeamPlayers(teamId: string | null) {
         }));
 
         if (!cancelled) {
-          setPlayers(members);
+          setMembers(members);
           setError(null);
         }
       } catch {
         if (!cancelled) {
-          setPlayers([]);
+          setMembers([]);
           setError('Nepodarilo sa načítať členov tímu');
         }
       } finally {
@@ -58,5 +58,5 @@ export function useTeamPlayers(teamId: string | null) {
     };
   }, [teamId]);
 
-  return { players, loading, error };
+  return { members, loading, error };
 }
