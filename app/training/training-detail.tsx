@@ -4,7 +4,7 @@ import { ActivityIndicator, Text } from "react-native-paper";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { auth } from "../../firebase";
 
-import { useTraining } from "../../hooks/useTraining";
+import { useTraining } from "../../hooks/trainings/useTraining";
 import { useTeamMembers } from "@/hooks/useTeamMembers";
 import { useTrainingAttendance } from "../../hooks/useTrainingAttendance";
 import { useMyTeamRoles } from "@/hooks/useMyTeamRoles";
