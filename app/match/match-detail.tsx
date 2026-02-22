@@ -22,7 +22,7 @@ import {
   View,
 } from "react-native";
 import { auth, db } from "../../firebase";
-import { useTeamPlayers } from "../../hooks/useTeamMembers";
+import { useTeamMembers } from "../../hooks/useTeamMembers";
 
 type Match = {
   id: string;
@@ -56,10 +56,10 @@ export default function MatchDetailScreen() {
   const [match, setMatch] = useState<Match | null>(null);
   // Use hook for players
   const {
-    players,
+    members,
     loading: playersLoading,
     error: playersError,
-  } = useTeamPlayers(teamId);
+  } = useTeamMembers(teamId);
   const [attendances, setAttendances] = useState<Attendance[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUserRoles, setCurrentUserRoles] = useState<string[]>([]);
@@ -223,7 +223,7 @@ export default function MatchDetailScreen() {
       <Text style={styles.sectionTitle}>Dochádzka hráčov</Text>
 
       <FlatList
-        data={players}
+        data={members}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
           const fullName =

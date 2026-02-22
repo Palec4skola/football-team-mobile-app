@@ -29,7 +29,7 @@ export default function MatchesScreen() {
             {isCoach && (
                 <Button
                     style={styles.addButton}
-                    onPress={() => router.push({ pathname: '/team/create-match', params: { teamId } })}
+                    onPress={() => router.push({ pathname: '/match/create-match', params: { teamId } })}
                 >
                     <Text style={styles.addButtonText}>Pridať zápas</Text>
                 </Button>
@@ -43,7 +43,7 @@ export default function MatchesScreen() {
                     keyExtractor={(item) => item.id}
                     renderItem={({ item }) => (
                         <Button style={styles.matchItem}
-                        onPress={()=> router.push({pathname: '/team/match-detail', params: { teamId, matchId: item.id }})}>
+                        onPress={()=> router.push({pathname: '/match/match-detail', params: { teamId, matchId: item.id }})}>
                             <Text style={styles.matchName}>{item.opponent}</Text>
                             <Text>Dátum: {item.date?.toDate ? item.date.toDate().toLocaleDateString() : item.date}</Text>
                             <Text>Miesto: {item.place}</Text>

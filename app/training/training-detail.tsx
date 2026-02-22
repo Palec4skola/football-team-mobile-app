@@ -1,17 +1,17 @@
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import { View } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
-import { useLocalSearchParams, useRouter } from "expo-router";
 import { auth } from "../../firebase";
 
-import { useTraining } from "../../hooks/trainings/useTraining";
-import { useTeamMembers } from "@/hooks/useTeamMembers";
-import { useTrainingAttendance } from "../../hooks/useTrainingAttendance";
+import { AttendanceStatus, trainingRepo } from "@/data/firebase/TrainingRepo";
 import { useMyTeamRoles } from "@/hooks/useMyTeamRoles";
-import { trainingRepo, AttendanceStatus } from "@/data/firebase/TrainingRepo";
+import { useTeamMembers } from "@/hooks/useTeamMembers";
+import { useTraining } from "../../hooks/training/useTraining";
+import { useTrainingAttendance } from "../../hooks/useTrainingAttendance";
 
-import { PlayersTable } from "@/components/team/playersTable";
 import { AttendanceButtons } from "@/components/attendance/attendanceButtons";
+import { PlayersTable } from "@/components/team/playersTable";
 
 export default function TrainingDetailScreen() {
   const router = useRouter();

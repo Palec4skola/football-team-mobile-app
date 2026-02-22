@@ -59,9 +59,9 @@ export default function HomeScreen() {
 
   // Navigačné callbacky (už vieme, že teamId existuje)
   const onGoTrainings = () =>
-    router.push({ pathname: "/team/training-list", params: { teamId } });
+    router.push({ pathname: "/training/training-list", params: { teamId } });
   const onGoMatches = () =>
-    router.push({ pathname: "/team/match-list", params: { teamId } });
+    router.push({ pathname: "/match/match-list", params: { teamId } });
   const onGoAnnouncements = () =>
     router.push({ pathname: "/team/announcement", params: { teamId } });
   const onGoWellness = () =>

@@ -1,9 +1,9 @@
 // app/team/create-training.tsx
+import { TrainingForm } from "@/components/trainings/TrainingForm";
+import { useCreateTraining } from "@/hooks/training/useCreateTraining";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { View } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { TrainingForm } from "@/components/trainings/TrainingForm";
-import { useCreateTraining } from "@/hooks/trainings/useCreateTraining";
 
 export default function CreateTrainingScreen() {
   const router = useRouter();
@@ -26,7 +26,7 @@ export default function CreateTrainingScreen() {
 
     // po vytvorení choď na list alebo detail
     router.replace({
-      pathname: "/team/training-list",
+      pathname: "/training/training-list",
       params: { teamId },
     });
   };

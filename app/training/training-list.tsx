@@ -1,11 +1,11 @@
+import { useTeamTrainings } from "@/hooks/training/useTeamTrainings";
+import { useTrainingActions } from "@/hooks/training/useTrainingActions";
 import { useRouter } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
 import React from "react";
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
 import { Button, Card, Text } from "react-native-paper";
-import { useTeamTrainings } from "@/hooks/trainings/useTeamTrainings";
 import { useUserRole } from "../../hooks/useUserRole";
-import { useTrainingActions } from "@/hooks/trainings/useTrainingActions";
 
 export default function TrainingListScreen() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export default function TrainingListScreen() {
   const { trainings, loading } = useTeamTrainings(teamId);
   const { isCoach, loadingRole } = useUserRole();
   const { deleteTraining } = useTrainingActions(teamId);
-  
+
   if (loading || loadingRole) {
     return (
       <View style={styles.center}>
@@ -31,34 +31,44 @@ export default function TrainingListScreen() {
 
     return (
       <Card style={styles.card}>
-      <Card.Title title={item.name} />
-      <Card.Content>
-        <Text>Dátum: {dateText}</Text>
-        {item.description ? <Text>Popis: {item.description}</Text> : null}
-      </Card.Content>
+        <Card.Title title={item.name} />
+        <Card.Content>
+          <Text>Dátum: {dateText}</Text>
+          {item.description ? <Text>Popis: {item.description}</Text> : null}
+        </Card.Content>
 
-      <Card.Actions>
-        <Button onPress={() => router.push({ pathname: "/team/training-detail", params: { teamId, trainingId: item.id } })}>
-          Detail
-        </Button>
+        <Card.Actions>
+          <Button
+            onPress={() =>
+              router.push({
+                pathname: "/training/training-detail",
+                params: { teamId, trainingId: item.id },
+              })
+            }
+          >
+            Detail
+          </Button>
 
-        {isCoach && (
-          <>
-            <Button
-              onPress={() =>
-                router.push({ pathname: "/team/edit-training", params: { teamId, trainingId: item.id } })
-              }
-            >
-              Upraviť
-            </Button>
+          {isCoach && (
+            <>
+              <Button
+                onPress={() =>
+                  router.push({
+                    pathname: "/training/edit-training",
+                    params: { teamId, trainingId: item.id },
+                  })
+                }
+              >
+                Upraviť
+              </Button>
 
-            <Button onPress={() => deleteTraining(item.id)} textColor="red">
-              Zmazať
-            </Button>
-          </>
-        )}
-      </Card.Actions>
-    </Card>
+              <Button onPress={() => deleteTraining(item.id)} textColor="red">
+                Zmazať
+              </Button>
+            </>
+          )}
+        </Card.Actions>
+      </Card>
     );
   };
 
@@ -69,7 +79,7 @@ export default function TrainingListScreen() {
           mode="contained"
           onPress={() =>
             router.push({
-              pathname: "/team/create-training",
+              pathname: "/training/create-training",
               params: { teamId },
             })
           }
