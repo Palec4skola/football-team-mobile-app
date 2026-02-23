@@ -128,7 +128,7 @@ export const matchRepo = {
     await updateDoc(ref, updatePayload);
   },
 
-  async remove(teamId: string, matchId: string): Promise<void> {
+  async delete(teamId: string, matchId: string): Promise<void> {
     const ref = matchDocRef(teamId, matchId);
     await deleteDoc(ref);
   },

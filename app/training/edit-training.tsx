@@ -34,7 +34,6 @@ export default function EditTrainingScreen() {
       </View>
     );
   }
-
   if (!training) {
     return (
       <View style={{ flex: 1, padding: 16 }}>

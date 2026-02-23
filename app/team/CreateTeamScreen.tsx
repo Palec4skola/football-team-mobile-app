@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { Button, Text } from "react-native-paper";
 import { auth } from "../../firebase";
 import { createTeam } from "@/services/teams/createTeams";
-import { styles } from "./createTeam.styles";
+import { styles } from "../../styles/createTeam.styles";
 
 export default function CreateTeamScreen() {
   const router = useRouter();
