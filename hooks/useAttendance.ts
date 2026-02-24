@@ -1,19 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
-import { AttendanceDoc, trainingRepo } from "@/data/firebase/TrainingRepo";
+import { attendanceRepo, AttendanceDoc } from "@/data/firebase/AttendanceRepo";
 
-export function useTrainingAttendance(teamId?: string, trainingId?: string) {
+export function useAttendance(teamId?: string, eventId?: string, event?: string) {
   const [rows, setRows] = useState<AttendanceDoc[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!teamId || !trainingId) return;
+    if (!teamId || !eventId || !event) return;
     setLoading(true);
-    const unsub = trainingRepo.watchAttendance(teamId, trainingId, (list) => {
+    const unsub = attendanceRepo.watchAttendance(teamId, eventId, event, (list) => {
       setRows(list);
       setLoading(false);
     });
     return () => unsub();
-  }, [teamId, trainingId]);
+  }, [teamId, eventId, event]);
 
   const byUserId = useMemo(() => {
     const map: Record<string, AttendanceDoc> = {};

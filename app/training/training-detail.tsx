@@ -4,14 +4,14 @@ import { View } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
 import { auth } from "../../firebase";
 
-import { AttendanceStatus, trainingRepo } from "@/data/firebase/TrainingRepo";
 import { useMyTeamRoles } from "@/hooks/useMyTeamRoles";
 import { useTeamMembers } from "@/hooks/useTeamMembers";
 import { useTraining } from "../../hooks/training/useTraining";
-import { useTrainingAttendance } from "../../hooks/useTrainingAttendance";
+import { useAttendance } from "@/hooks/useAttendance";
 
 import { AttendanceButtons } from "@/components/attendance/attendanceButtons";
 import { PlayersTable } from "@/components/team/playersTable";
+import { attendanceRepo, AttendanceStatus } from "@/data/firebase/AttendanceRepo";
 
 export default function TrainingDetailScreen() {
   const router = useRouter();
@@ -27,9 +27,10 @@ export default function TrainingDetailScreen() {
     trainingId,
   );
   const { members, loading: loadingMembers } = useTeamMembers(teamId);
-  const { byUserId, loading: loadingAtt } = useTrainingAttendance(
+  const { byUserId, loading: loadingAtt } = useAttendance(
     teamId,
     trainingId,
+    "trainings",
   );
   const { isCoach, loading: loadingRoles } = useMyTeamRoles(teamId, userId);
 
@@ -67,7 +68,7 @@ export default function TrainingDetailScreen() {
   const canEdit = (rowUserId: string) => isCoach || rowUserId === userId;
 
   const setAttendance = async (rowUserId: string, status: AttendanceStatus) => {
-    await trainingRepo.setAttendance(teamId, trainingId, rowUserId, status);
+    await attendanceRepo.setAttendance(teamId, trainingId, "trainings", rowUserId, status);
   };
 
   return (

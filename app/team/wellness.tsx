@@ -37,7 +37,7 @@ export default function WellnessScreen() {
         )}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
-      <TouchableOpacity style={styles.button} onPress={()=> router.push('./wellnessForm')}>
+      <TouchableOpacity style={styles.button} onPress={()=> router.push('./wellnessFormScreen')}>
         <Text style={styles.buttonText}>Zadať nové wellness hodnoty</Text>
       </TouchableOpacity>
     </View>

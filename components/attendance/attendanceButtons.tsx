@@ -1,7 +1,7 @@
 import React from "react";
 import { View } from "react-native";
 import { Button } from "react-native-paper";
-import { AttendanceStatus } from "@/data/firebase/TrainingRepo";
+import { AttendanceStatus } from "@/data/firebase/AttendanceRepo";
 
 export function AttendanceButtons({
   value,

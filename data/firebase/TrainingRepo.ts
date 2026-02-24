@@ -21,14 +21,6 @@ export type TrainingModel = {
   startsAt?: any; // Timestamp
 };
 
-export type AttendanceStatus = "yes" | "no" | "maybe";
-
-export type AttendanceDoc = {
-  userId: string;
-  status: AttendanceStatus;
-  updatedAt?: any;
-};
-
 export type CreateTrainingInput = {
   name: string;
   description?: string;
@@ -40,39 +32,22 @@ export type UpdateTrainingInput = {
   name?: string;
   description?: string;
   startsAt?: Date;
-}
+};
 
 function mapDoc<T = DocumentData>(snap: any): T {
   return { id: snap.id, ...(snap.data() as any) };
 }
 
 export const trainingRepo = {
-  watchTraining(teamId: string, trainingId: string, cb: (t: TrainingModel | null) => void): Unsubscribe {
+  watchTraining(
+    teamId: string,
+    trainingId: string,
+    cb: (t: TrainingModel | null) => void,
+  ): Unsubscribe {
     const ref = doc(db, "teams", teamId, "trainings", trainingId);
     return onSnapshot(ref, (snap) => {
       cb(snap.exists() ? mapDoc<TrainingModel>(snap) : null);
     });
-  },
-
-  watchAttendance(teamId: string, trainingId: string, cb: (rows: AttendanceDoc[]) => void): Unsubscribe {
-    const colRef = collection(db, "teams", teamId, "trainings", trainingId, "attendance");
-    return onSnapshot(colRef, (snap) => {
-      cb(
-        snap.docs.map((d) => ({
-          userId: d.id,
-          ...(d.data() as any),
-        }))
-      );
-    });
-  },
-
-  async setAttendance(teamId: string, trainingId: string, userId: string, status: AttendanceStatus) {
-    const ref = doc(db, "teams", teamId, "trainings", trainingId, "attendance", userId);
-    await setDoc(
-      ref,
-      { status, updatedAt: serverTimestamp() },
-      { merge: true }
-    );
   },
 
   async create(teamId: string, input: CreateTrainingInput) {
@@ -91,14 +66,15 @@ export const trainingRepo = {
   },
 
   async update(teamId: string, trainingId: string, input: UpdateTrainingInput) {
-    const ref = doc(db,"teams", teamId, "trainings", trainingId);
+    const ref = doc(db, "teams", teamId, "trainings", trainingId);
 
     const patch: any = {
       updatedAt: serverTimestamp(),
     };
     if (input.name != null) patch.name = input.name.trim();
     if (input.description != null) patch.description = input.description.trim();
-    if (input.startsAt != null) patch.startsAt = Timestamp.fromDate(input.startsAt);
+    if (input.startsAt != null)
+      patch.startsAt = Timestamp.fromDate(input.startsAt);
     await updateDoc(ref, patch);
   },
 
@@ -109,7 +85,7 @@ export const trainingRepo = {
 
   watchByTeam(
     teamId: string,
-    cb: (rows: TrainingModel[]) => void
+    cb: (rows: TrainingModel[]) => void,
   ): Unsubscribe {
     const colRef = collection(db, "teams", teamId, "trainings");
     const q = query(colRef, orderBy("startsAt", "asc"));
@@ -119,8 +95,14 @@ export const trainingRepo = {
     });
   },
 
-  watchOne(teamId: string, trainingId: string, cb: (t: any | null) => void): Unsubscribe {
-  const ref = doc(db, "teams", teamId, "trainings", trainingId);
-  return onSnapshot(ref, (snap) => cb(snap.exists() ? ({ id: snap.id, ...(snap.data() as any) }) : null));
-}
+  watchOne(
+    teamId: string,
+    trainingId: string,
+    cb: (t: any | null) => void,
+  ): Unsubscribe {
+    const ref = doc(db, "teams", teamId, "trainings", trainingId);
+    return onSnapshot(ref, (snap) =>
+      cb(snap.exists() ? { id: snap.id, ...(snap.data() as any) } : null),
+    );
+  },
 };

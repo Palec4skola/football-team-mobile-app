@@ -1,308 +1,103 @@
 // app/team/match-detail.tsx
-import { useRouter } from "expo-router";
-import { useSearchParams } from "expo-router/build/hooks";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  updateDoc,
-  where,
-} from "firebase/firestore";
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { auth, db } from "../../firebase";
-import { useTeamMembers } from "../../hooks/useTeamMembers";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useMemo } from "react";
+import { View } from "react-native";
+import { ActivityIndicator, Text } from "react-native-paper";
+import { auth } from "@/firebase";
 
-type Match = {
-  id: string;
-  teamId: string;
-  opponent: string;
-  place?: string;
-  date?: any; // Firestore Timestamp alebo string
-};
+import { useMyTeamRoles } from "@/hooks/useMyTeamRoles";
+import { useTeamMembers } from "@/hooks/useTeamMembers";
 
-type Player = {
-  id: string;
-  firstName?: string;
-  lastName?: string;
-  roles?: string[] | string;
-};
+import { useMatch } from "@/hooks/match/useMatch";
+import { useAttendance } from "@/hooks/useAttendance";
+import { attendanceRepo, AttendanceStatus } from "@/data/firebase/AttendanceRepo";
 
-type Attendance = {
-  id: string;
-  teamId: string;
-  matchId: string;
-  userId: string;
-  status: "yes" | "no";
-};
 
+import { PlayersTable } from "@/components/team/playersTable";
+import { AttendanceButtons } from "@/components/attendance/attendanceButtons";
 export default function MatchDetailScreen() {
-  const params = useSearchParams();
   const router = useRouter();
-  const matchId = params.get("matchId");
-  const teamId = params.get("teamId");
+  const { teamId, matchId } = useLocalSearchParams<{ teamId: string; matchId: string }>();
 
-  const [match, setMatch] = useState<Match | null>(null);
-  // Use hook for players
-  const {
-    members,
-    loading: playersLoading,
-    error: playersError,
-  } = useTeamMembers(teamId);
-  const [attendances, setAttendances] = useState<Attendance[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [currentUserRoles, setCurrentUserRoles] = useState<string[]>([]);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const userId = auth.currentUser?.uid;
 
-  const isCoach = currentUserRoles.includes("coach");
+  const { match, loading: loadingMatch } = useMatch(teamId, matchId);
+  const { members, loading: loadingMembers } = useTeamMembers(teamId);
+  const { byUserId, loading: loadingAtt } = useAttendance(teamId, matchId, "matches");
+  const { isCoach, loading: loadingRoles } = useMyTeamRoles(teamId, userId);
 
-  // mapa attendance podľa userId
-  const attendanceByUserId = useMemo(() => {
-    const map: Record<string, Attendance> = {};
-    attendances.forEach((a) => {
-      map[a.userId] = a;
-    });
-    return map;
-  }, [attendances]);
+  const loading = loadingMatch || loadingMembers || loadingAtt || loadingRoles;
 
-  useEffect(() => {
-    const user = auth.currentUser;
-    if (user) {
-      setCurrentUserId(user.uid);
-      // načítaj roly pre aktuálneho používateľa
-      const loadRoles = async () => {
-        try {
-          const userRef = doc(db, "users", user.uid);
-          const userSnap = await getDoc(userRef);
-          if (userSnap.exists()) {
-            const data = userSnap.data();
-            if (Array.isArray(data.roles)) {
-              setCurrentUserRoles(data.roles);
-            } else if (data.roles) {
-              setCurrentUserRoles([data.roles]);
-            } else {
-              setCurrentUserRoles([]);
-            }
-          }
-        } catch (e: any) {
-          console.log("Error loading roles:", e.message);
-        }
-      };
-      loadRoles();
-    }
-  }, []);
+  const formattedDate = useMemo(() => {
+    if (!match?.date) return "---";
+    return match.date?.toDate?.()
+      ? match.date.toDate().toLocaleString()
+      : String(match.date);
+  }, [match?.date]);
 
-  useEffect(() => {
-    if (!matchId || !teamId) {
-      Alert.alert("Chyba", "Chýba matchId alebo teamId");
-      router.back();
-      return;
-    }
+  if (!teamId || !matchId) {
+    router.back();
+    return null;
+  }
 
-    const loadData = async () => {
-      setLoading(true);
-      try {
-        // 1) zápas
-        const matchRef = doc(db, "matches", matchId);
-        const matchSnap = await getDoc(matchRef);
-        if (!matchSnap.exists()) {
-          Alert.alert("Chyba", "Zápas nebol nájdený");
-          router.back();
-          return;
-        }
-        const matchData = matchSnap.data();
-        setMatch({
-          id: matchSnap.id,
-          ...(matchData as any),
-        });
-
-        // 2) attendance pre daný zápas
-        const attQ = query(
-          collection(db, "attendances"),
-          where("matchId", "==", matchId),
-          where("teamId", "==", teamId),
-        );
-        const attSnap = await getDocs(attQ);
-        const attList: Attendance[] = attSnap.docs.map((d) => ({
-          id: d.id,
-          ...(d.data() as any),
-        }));
-        setAttendances(attList);
-      } catch (e: any) {
-        Alert.alert("Chyba", "Nepodarilo sa načítať údaje o zápase");
-        console.log(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, [matchId, teamId, router]);
-
-  const updateAttendance = async (userId: string, status: "yes" | "no") => {
-    if (!teamId || !matchId) return;
-    try {
-      const existing = attendanceByUserId[userId];
-      if (existing) {
-        await updateDoc(doc(db, "attendances", existing.id), {
-          status,
-          updatedAt: new Date(),
-        });
-        setAttendances((prev) =>
-          prev.map((a) => (a.id === existing.id ? { ...a, status } : a)),
-        );
-      } else {
-        const ref = await addDoc(collection(db, "attendances"), {
-          teamId,
-          matchId,
-          userId,
-          status,
-          updatedAt: new Date(),
-        });
-        setAttendances((prev) => [
-          ...prev,
-          { id: ref.id, teamId, matchId, userId, status },
-        ]);
-      }
-    } catch (e: any) {
-      Alert.alert("Chyba", "Nepodarilo sa uložiť dochádzku");
-      console.log(e);
-    }
-  };
-
-  const renderStatusText = (userId: string) => {
-    const att = attendanceByUserId[userId];
-    if (!att) return "Neurčené";
-    if (att.status === "yes") return "Príde";
-    if (att.status === "no") return "Nepríde";
-    return "Neurčené";
-  };
-
-  if (loading || playersLoading || !match) {
+  if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" />
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator />
       </View>
     );
   }
 
-  if (playersError) {
+  if (!match) {
     return (
-      <View style={styles.center}>
-        <Text>Chyba načítania hráčov: {playersError}</Text>
+      <View style={{ padding: 16 }}>
+        <Text>Zápas nebol nájdený.</Text>
       </View>
     );
   }
 
-  const formattedDate =
-    match.date && match.date.toDate
-      ? match.date.toDate().toLocaleDateString()
-      : (match.date ?? "---");
+  const canEdit = (rowUserId: string) => isCoach || rowUserId === userId;
+
+  const setAttendance = async (rowUserId: string, status: AttendanceStatus) => {
+    await attendanceRepo.setAttendance(teamId, matchId, "matches", rowUserId, status);
+  };
 
   return (
-    <View style={styles.container}>
-      {/* Info o tréningu */}
-      <View style={styles.matchCard}>
-        <Text style={styles.matchTitle}>{match.opponent}</Text>
-        <Text style={styles.matchInfo}>Dátum: {formattedDate}</Text>
-        <Text style={styles.matchInfo}>Miesto: {match.place}</Text>
+    <View style={{ flex: 1, padding: 16 }}>
+      <View
+        style={{
+          padding: 16,
+          borderRadius: 10,
+          backgroundColor: "#f2f2f2",
+          marginBottom: 12,
+        }}
+      >
+        <Text variant="titleMedium">{match.opponent}</Text>
+        <Text>Dátum: {formattedDate}</Text>
+        {match.place ? <Text>Miesto: {match.place}</Text> : null}
       </View>
 
-      {/* Dochádzka */}
-      <Text style={styles.sectionTitle}>Dochádzka hráčov</Text>
+      <Text variant="titleMedium" style={{ marginBottom: 8 }}>
+        Dochádzka hráčov
+      </Text>
 
-      <FlatList
-        data={members}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => {
-          const fullName =
-            `${item.firstName ?? ""} ${item.lastName ?? ""}`.trim() ||
-            "Neznámy hráč";
-          const statusText = renderStatusText(item.id);
-          const isCurrentUser = currentUserId === item.id;
-
-          const canEditThisRow = isCoach || isCurrentUser; // tréner všetkých, hráč len seba
-
-          return (
-            <View style={styles.playerRow}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.playerName}>{fullName}</Text>
-                <Text style={styles.playerStatus}>Stav: {statusText}</Text>
-              </View>
-
-              {canEditThisRow && (
-                <View style={styles.buttonsRow}>
-                  <TouchableOpacity
-                    style={[
-                      styles.statusButton,
-                      statusText === "Príde" && styles.statusYes,
-                    ]}
-                    onPress={() => updateAttendance(item.id, "yes")}
-                  >
-                    <Text style={styles.statusButtonText}>Prídem</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.statusButton,
-                      statusText === "Nepríde" && styles.statusNo,
-                    ]}
-                    onPress={() => updateAttendance(item.id, "no")}
-                  >
-                    <Text style={styles.statusButtonText}>Neprídem</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          );
-        }}
-        ListEmptyComponent={<Text>Žiadni hráči pre tento tím.</Text>}
-      />
+      <PlayersTable
+              members={members}
+              onPressPlayer={(id) => {
+                // napr. detail hráča alebo nič
+                // router.push({ pathname: "/team/player-detail", params: { teamId, userId: id } });
+              }}
+              renderRight={(player) => {
+                const current = byUserId[player.id]?.status ?? "maybe";
+                return (
+                  <AttendanceButtons
+                    value={current}
+                    disabled={!canEdit(player.id)}
+                    onChange={(v) => setAttendance(player.id, v)}
+                  />
+                );
+              }}
+            />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#fff" },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  matchCard: {
-    marginBottom: 16,
-    padding: 16,
-    backgroundColor: "#f2f2f2",
-    borderRadius: 10,
-  },
-  matchTitle: { fontSize: 20, fontWeight: "bold", marginBottom: 8 },
-  matchInfo: { fontSize: 14, marginBottom: 4 },
-  sectionTitle: { fontSize: 18, fontWeight: "600", marginBottom: 8 },
-  playerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ddd",
-  },
-  playerName: { fontSize: 16, fontWeight: "500" },
-  playerStatus: { fontSize: 14, color: "#555" },
-  buttonsRow: { flexDirection: "row", gap: 8 },
-  statusButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    marginLeft: 8,
-  },
-  statusYes: { backgroundColor: "#d4fcd4", borderColor: "#3bb54a" },
-  statusNo: { backgroundColor: "#fcd4d4", borderColor: "#d9534f" },
-  statusButtonText: { fontSize: 12 },
-});
