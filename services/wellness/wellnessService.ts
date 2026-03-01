@@ -1,67 +1,36 @@
-import {
-  doc, getDoc, setDoc, serverTimestamp,
-  collection, onSnapshot, query
-} from "firebase/firestore";
-import { db } from "@/firebase";
+import type { WellnessSaveInput } from "@/data/firebase/WellnessRepo"; // alebo si typ presuň do shared
 
-export const wellnessPath = (teamId: string, dateKey: string) =>
-  `teams/${teamId}/wellness/${dateKey}/entries`;
-
-export function calcWellnessScore(d: {
-  sleepQuality: number; muscleSoreness: number; fatigue: number; stress: number; mood: number; energy: number;
-}) {
-  return (
-    d.sleepQuality +
-    (6 - d.muscleSoreness) +
-    (6 - d.fatigue) +
-    (6 - d.stress) +
-    d.mood +
-    d.energy
-  );
+function clamp(v: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, v));
 }
 
-export async function getTodayEntry(teamId: string, dateKey: string, userId: string) {
-  const ref = doc(db, wellnessPath(teamId, dateKey), userId);
-  const snap = await getDoc(ref);
-  return snap.exists() ? ({ id: snap.id, ...snap.data() } as any) : null;
+// 1..5 -> 0..1
+function pos1to5(v: number) {
+  return clamp((v - 1) / 4, 0, 1);
 }
 
-export async function upsertTodayEntry(
-  teamId: string,
-  dateKey: string,
-  userId: string,
-  data: any
-) {
-  const ref = doc(db, wellnessPath(teamId, dateKey), userId);
-  const existing = await getDoc(ref);
-
-  const score = calcWellnessScore({
-    sleepQuality: data.sleepQuality,
-    muscleSoreness: data.muscleSoreness,
-    fatigue: data.fatigue,
-    stress: data.stress,
-    mood: data.mood,
-    energy: data.energy,
-  });
-
-  await setDoc(
-    ref,
-    {
-      ...data,
-      score,
-      updatedAt: serverTimestamp(),
-      ...(existing.exists() ? {} : { createdAt: serverTimestamp() }),
-    },
-    { merge: true }
-  );
-
-  return score;
+// 1..5 kde nižšie je lepšie -> 1..0
+function neg1to5(v: number) {
+  return 1 - pos1to5(v);
 }
 
-export function subscribeTeamToday(teamId: string, dateKey: string, cb: (rows: any[]) => void) {
-  const col = collection(db, wellnessPath(teamId, dateKey));
-  const q = query(col);
-  return onSnapshot(q, (snap) => {
-    cb(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-  });
+// ideál okolo 8h
+function sleepHoursScore(hours: number) {
+  const diff = Math.abs(hours - 8);
+  const score = 1 - diff / 4; // 8->1, 6/10->0.5, 4/12->0
+  return clamp(score, 0, 1);
+}
+
+export function computeWellnessScore10(e: WellnessSaveInput): number {
+  const s =
+    pos1to5(e.energy) +
+    pos1to5(e.mood) +
+    pos1to5(e.sleepQuality) +
+    sleepHoursScore(e.sleepHours) +
+    neg1to5(e.fatigue) +
+    neg1to5(e.stress) +
+    neg1to5(e.muscleSoreness);
+
+  const score0to1 = s / 7;
+  return Math.round(score0to1 * 10); // 0..10
 }

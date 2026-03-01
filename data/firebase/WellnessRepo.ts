@@ -10,16 +10,19 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/firebase";
+import { computeWellnessScore10 } from "@/services/wellness/wellnessService";
 
 export type WellnessEntryDoc = {
-  sleepHours: number; // 0..12
-  sleepQuality: number; // 1..5 (u teba: zlá -> výborná)
-  fatigue: number; // 1..5
-  muscleSoreness: number; // 1..5
-  stress: number; // 1..5
-  mood: number; // 1..5
-  energy: number; // 1..5
+  sleepHours: number;
+  sleepQuality: number;
+  fatigue: number;
+  muscleSoreness: number;
+  stress: number;
+  mood: number;
+  energy: number;
   injuryNote?: string;
+
+  score?: number; // ✅ uložené v DB (0..10)
 
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
@@ -75,30 +78,21 @@ export const wellnessRepo = {
     );
   },
 
-  async upsert(
-    teamId: string,
-    dateKey: string,
-    userId: string,
-    input: WellnessSaveInput,
-  ): Promise<void> {
-    const ref = entryRef(teamId, dateKey, userId);
-    console.log("[wellness.upsert]", {
-      teamId,
-      dateKey,
-      userId,
-      path: `teams/${teamId}/wellness/${dateKey}/entries/${userId}`,
-      input,
-    }); // chceme rozlíšiť create vs update kvôli createdAt
-    const existing = await getDoc(ref);
+  async upsert(teamId: string, dateKey: string, userId: string, input: WellnessSaveInput) {
+  const ref = entryRef(teamId, dateKey, userId);
+  const existing = await getDoc(ref);
 
-    const payload: WellnessEntryWrite = {
-      ...input,
-      updatedAt: serverTimestamp(),
-      ...(existing.exists() ? {} : { createdAt: serverTimestamp() }),
-    };
+  const score = computeWellnessScore10(input); // ✅ vypočítaj tu
 
-    await setDoc(ref, payload, { merge: true });
-  },
+  const payload: WellnessEntryWrite & { score: number } = {
+    ...input,
+    score, // ✅ uložiť
+    updatedAt: serverTimestamp(),
+    ...(existing.exists() ? {} : { createdAt: serverTimestamp() }),
+  };
+
+  await setDoc(ref, payload, { merge: true });
+},
 
   
   onTeamEntriesForDay(

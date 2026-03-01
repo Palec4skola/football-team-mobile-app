@@ -137,7 +137,7 @@ export default function HomeAmateur({
                 </Text>
               </View>
             </View>
-            <Text style={s.line}>•Táto sekcia zobrazuje dochádzku hráčov na tréningoch a zápasoch.</Text>
+            <Text style={s.line}>•Táto sekcia zobrazuje dochádzku hráčov na tréningoch.</Text>
           </View>
         </TouchableRipple>
       </Card>

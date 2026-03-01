@@ -1,104 +1,82 @@
-import React from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import React, { useMemo } from "react";
+import { View, Text, ActivityIndicator, Pressable } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
-// Ukážkové dáta hráčov a wellness indexu
-const players = [
-  { id: '1', name: 'Ján Novák', wellness: 8 },
-  { id: '2', name: 'Peter Horváth', wellness: 6 },
-  { id: '3', name: 'Marek Kováč', wellness: 9 },
-  { id: '4', name: 'Tomáš Urban', wellness: 5 },
-  { id: '5', name: 'Martin Šimek', wellness: 7 },
-];
+import { PlayersTable } from "@/components/team/playersTable";
+import { WellnessBadge } from "@/components/wellnessBadge";
 
-export default function WellnessScreen() {
+import { useTeamMembers } from "@/hooks/useTeamMembers";
+import { useTeamWellnessForDay } from "@/hooks/useTeamWellnessForDay";
+import { localDateKey } from "@/utils/dateUtils";
+
+import { styles } from "@/styles/wellnessTeamScreen";
+
+export default function WellnessTeamScreen() {
   const router = useRouter();
-  // Funkcia na zobrazenie farby podľa wellness indexu
-  const getWellnessColor = (value: number) => {
-    if (value >= 8) return '#4CAF50'; // zelená
-    if (value >= 6) return '#FFC107'; // žltá
-    return '#F44336'; // červená
+  const { teamId } = useLocalSearchParams<{ teamId: string }>();
+
+  const dateKey = useMemo(() => localDateKey(), []);
+
+  const { members, loading: loadingMembers, error: membersError } = useTeamMembers(teamId);
+  const { loading, error, scoreByUser } = useTeamWellnessForDay(teamId, dateKey);
+
+  const goToForm = () => {
+    router.push({
+      pathname: "/team/wellnessFormScreen",
+      params: { teamId },
+    });
   };
+
+  const goToPlayerDetail = (playerId: string) => {
+    router.push({
+      pathname: "/team/wellness-player",
+      params: { teamId, playerId },
+    });
+  };
+
+  if (loading || loadingMembers) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator />
+        <Text style={styles.loaderText}>Načítavam wellness…</Text>
+      </View>
+    );
+  }
+
+  const anyError = error || membersError;
+  if (anyError) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorTitle}>Chyba</Text>
+        <Text style={styles.errorText}>{anyError}</Text>
+
+        <View style={styles.footer}>
+          <Pressable style={styles.button} onPress={goToForm}>
+            <Text style={styles.buttonText}>Zadať nové wellness hodnoty</Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      
-      <Text style={styles.title}>Wellness hráčov</Text>
-      <FlatList
-        data={players}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.playerRow}>
-            <Text style={styles.playerName}>{item.name}</Text>
-            <View style={[styles.wellnessBox, { backgroundColor: getWellnessColor(item.wellness) }]}> 
-              <Text style={styles.wellnessText}>{item.wellness}/10</Text>
-            </View>
-          </View>
-        )}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
+      <View style={styles.header}>
+        <Text style={styles.title}>Wellness hráčov</Text>
+        <Text style={styles.subtitle}>Dnes ({dateKey})</Text>
+      </View>
+
+      <PlayersTable
+        members={members}
+        onPressPlayer={goToPlayerDetail}
+        renderRight={(player) => <WellnessBadge score={scoreByUser[player.id] ?? null} />}
       />
-      <TouchableOpacity style={styles.button} onPress={()=> router.push('./wellnessFormScreen')}>
-        <Text style={styles.buttonText}>Zadať nové wellness hodnoty</Text>
-      </TouchableOpacity>
+
+      <View style={styles.footer}>
+        <Pressable style={styles.button} onPress={goToForm}>
+          <Text style={styles.buttonText}>Zadať nové wellness hodnoty</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f2f4f8',
-    padding: 20,
-    paddingTop: 40,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    marginBottom: 24,
-    color: '#222',
-    textAlign: 'center',
-  },
-  playerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    paddingVertical: 16,
-    paddingHorizontal: 18,
-    marginBottom: 0,
-    elevation: 1,
-  },
-  playerName: {
-    fontSize: 18,
-    color: '#222',
-    fontWeight: '500',
-  },
-  wellnessBox: {
-    minWidth: 60,
-    borderRadius: 8,
-    paddingVertical: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  wellnessText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  separator: {
-    height: 10,
-  },
-  button: {
-    marginTop: 32,
-    backgroundColor: '#007AFF',
-    borderRadius: 8,
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 17,
-    fontWeight: '600',
-  },
-});
