@@ -7,6 +7,7 @@ type props = {
   onGoTrainings: () => void;
   onGoMatches: () => void;
   onGoAnnouncements: () => void;
+  onGoAttendance: () => void;
 };
 
 const nextActivity = {
@@ -33,6 +34,7 @@ export default function HomeAmateur({
   onGoTrainings,
   onGoMatches,
   onGoAnnouncements,
+  onGoAttendance,
 }: props) {
   const theme = useTheme();
 
@@ -115,6 +117,27 @@ export default function HomeAmateur({
                 <Text style={s.bulletText}>{msg}</Text>
               </View>
             ))}
+          </View>
+        </TouchableRipple>
+      </Card>
+      
+      <Card style={s.card} mode="elevated">
+        <TouchableRipple onPress={onGoAttendance} borderless>
+          <View style={s.cardInner}>
+            <View style={s.cardTopRow}>
+              <Text style={s.cardTitle}>Dochádzka hráčov na tréningoch</Text>
+              <View
+                style={[
+                  s.badge,
+                  { backgroundColor: theme.colors.tertiaryContainer },
+                ]}
+              >
+                <Text style={[s.badgeText, { color: theme.colors.onTertiaryContainer }]}>
+                  {announcements.length}
+                </Text>
+              </View>
+            </View>
+            <Text style={s.line}>•Táto sekcia zobrazuje dochádzku hráčov na tréningoch a zápasoch.</Text>
           </View>
         </TouchableRipple>
       </Card>

@@ -8,6 +8,7 @@ type props = {
   onGoMatches: () => void;
   onGoWellness: () => void;
   onGoAnnouncements: () => void;
+  onGoAttendance: () => void;
 };
 
 function GridCard({
@@ -49,6 +50,7 @@ export default function HomeProfessional({
   onGoMatches,
   onGoWellness,
   onGoAnnouncements,
+  onGoAttendance,
 }: props) {
   return (
     <ScrollView style={s.screen} contentContainerStyle={s.content}>
@@ -60,6 +62,7 @@ export default function HomeProfessional({
         <GridCard title="Zápasy" hint="Zostava a štatistiky" onPress={onGoMatches} />
         <GridCard title="Oznámenia" hint="Info pre tím" onPress={onGoAnnouncements} />
         <GridCard title="Wellness" hint="Regenerácia a zdravie" onPress={onGoWellness} />
+        <GridCard title="Dochádzka" hint="Prehľad dochádzky hráčov na tréningoch" onPress={onGoAttendance} />
       </View>
     </ScrollView>
   );

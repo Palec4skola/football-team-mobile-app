@@ -10,6 +10,8 @@ import {
   query,
   orderBy,
   updateDoc,
+  where,
+  getDocs,
   deleteDoc,
 } from "firebase/firestore";
 import { db } from "@/firebase";
@@ -19,6 +21,11 @@ export type TrainingModel = {
   name: string;
   description?: string;
   startsAt?: any; // Timestamp
+};
+
+export type Training = {
+  id: string;
+  startsAt: Timestamp;
 };
 
 export type CreateTrainingInput = {
@@ -104,5 +111,16 @@ export const trainingRepo = {
     return onSnapshot(ref, (snap) =>
       cb(snap.exists() ? { id: snap.id, ...(snap.data() as any) } : null),
     );
+  },
+
+  async listTrainingsFrom(teamId: string, fromDate: Date): Promise<Training[]> {
+    const trainingsRef = collection(db, "teams", teamId, "trainings");
+    const qTrainings = query(
+      trainingsRef,
+      where("startsAt", ">=", Timestamp.fromDate(fromDate)),
+    );
+
+    const snap = await getDocs(qTrainings);
+    return snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as Training[];
   },
 };

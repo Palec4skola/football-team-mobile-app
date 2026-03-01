@@ -1,4 +1,4 @@
-import { collection, doc, onSnapshot, serverTimestamp, setDoc, Unsubscribe } from "firebase/firestore";
+import { collection, doc, onSnapshot, serverTimestamp, setDoc, Unsubscribe, getDocs } from "firebase/firestore";
 import { db } from "@/firebase";
 
 export type AttendanceStatus = "yes" | "no" | "maybe";
@@ -29,5 +29,18 @@ export const attendanceRepo = {
       { status, updatedAt: serverTimestamp() },
       { merge: true }
     );
+  },
+
+  async listTrainingAttendance(teamId: string, trainingId: string) {
+    const ref = collection(db, "teams", teamId, "trainings", trainingId, "attendance");
+    const snap = await getDocs(ref);
+
+    // key = userId (docId)
+    const byUser: Record<string, AttendanceDoc> = {};
+    snap.forEach((d) => {
+      byUser[d.id] = d.data() as AttendanceDoc;
+    });
+
+    return byUser;
   },
 }
