@@ -1,7 +1,7 @@
 import { Tabs, useRouter, usePathname } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Button, Menu, Text } from "react-native-paper";
-import { useState, useMemo } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import { auth } from "@/firebase";
 import { useMyTeams } from "@/hooks/useMyTeams";
 import { userRepo } from "@/data/firebase/UserRepo";
@@ -10,7 +10,11 @@ import { useActiveTeam } from "@/hooks/useActiveTeam";
 export default function TabsLayout() {
   const router = useRouter();
   const pathname = usePathname();
+
   const [teamMenuOpen, setTeamMenuOpen] = useState(false);
+  const openMenu = useCallback(() => setTeamMenuOpen(true), []);
+  const closeMenu = useCallback(() => setTeamMenuOpen(false), []);
+
   const { teamId } = useActiveTeam();
 
   const uid = auth.currentUser?.uid ?? null;
@@ -19,29 +23,32 @@ export default function TabsLayout() {
 
   const activeTeamName = useMemo(() => {
     if (!activeTeamId) return "Vybrať tím";
-    return (
-      teams?.find((t) => t.teamId === activeTeamId)?.teamName ?? "Vybrať tím"
-    );
+    return teams?.find((t) => t.teamId === activeTeamId)?.teamName ?? "Vybrať tím";
   }, [teams, activeTeamId]);
 
-  const switchTeam = async (teamId: string) => {
-    if (!uid) {
-      setTeamMenuOpen(false);
-      return;
-    }
-    await userRepo.setActiveTeamId(uid, teamId);
-    setTeamMenuOpen(false);
-  };
+  const switchTeam = useCallback(
+    async (newTeamId: string) => {
+      if (!uid) {
+        closeMenu();
+        return;
+      }
 
-  const handleGoHome = () => {
-    router.push("..");
-  };
+      // ✅ zavri menu hneď, nečakaj na await
+      closeMenu();
 
-  const handleOpenChat = () => {
-    router.push("../chat/chat-list");
-  };
+      // ak klikol na ten istý tím, nerob nič
+      if (newTeamId === activeTeamId) return;
 
-  const showBackArrow = pathname !== "..)";
+      await userRepo.setActiveTeamId(uid, newTeamId);
+
+    },
+    [uid, activeTeamId, closeMenu],
+  );
+
+  const handleOpenChat = () => router.push("../chat/chat-list");
+
+  const canGoBack = router.canGoBack();
+
   return (
     <Tabs
       screenOptions={{
@@ -49,13 +56,9 @@ export default function TabsLayout() {
         headerTitle: () => (
           <Menu
             visible={teamMenuOpen}
-            onDismiss={() => setTeamMenuOpen(false)}
+            onDismiss={closeMenu}
             anchor={
-              <Button
-                onPress={() =>
-                  requestAnimationFrame(() => setTeamMenuOpen((v) => !v))
-                }
-              >
+              <Button onPress={openMenu}>
                 <Text>{activeTeamName}</Text>
                 <Ionicons name="chevron-down" size={18} color="#007AFF" />
               </Button>
@@ -71,11 +74,15 @@ export default function TabsLayout() {
           </Menu>
         ),
         headerLeft: () =>
-          showBackArrow ? (
-            <Button onPress={handleGoHome} style={{ marginLeft: 16 }}>
-              <Ionicons name="arrow-back-outline" size={26} color="#007AFF" />
-            </Button>
-          ) : null,
+          canGoBack ? (
+    <Button
+      onPress={() => router.back()}
+      style={{ marginLeft: 8 }}
+      compact
+    >
+      <Ionicons name="arrow-back-outline" size={24} color="#007AFF" />
+    </Button>
+  ) : null,
         headerRight: () => (
           <Button onPress={handleOpenChat} style={{ marginRight: 16 }}>
             <Ionicons name="chatbubbles-outline" size={26} color="#007AFF" />
