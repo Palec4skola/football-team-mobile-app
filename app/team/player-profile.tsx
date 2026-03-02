@@ -1,15 +1,23 @@
-// src/features/players/screens/PlayerProfileScreen.tsx
-import React from "react";
-import { StyleSheet, ActivityIndicator } from "react-native";
-import { Card, Text, Button } from "react-native-paper";
+import React, { useMemo } from "react";
+import { ScrollView, View, ActivityIndicator } from "react-native";
+import { Card, Text, Button, Avatar, Chip, Divider } from "react-native-paper";
+import { useRouter } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
 
 import { usePlayerProfile } from "@/hooks/usePlayerProfile";
 import { RoleSelectorCard } from "@/components/team/roleSelectorCard";
 import { PhysicalStatsCard } from "@/components/team/player/physicalStatsCard";
 import { EditStatModal } from "@/components/team/player/editStatModal";
+import { styles } from "@/styles/playerProfileScreen.styles";
+
+function labelRole(role: string) {
+  if (role === "coach") return "Tréner";
+  if (role === "player") return "Hráč";
+  return role;
+}
 
 export default function PlayerProfileScreen() {
+  const router = useRouter();
   const params = useSearchParams();
   const playerId = params.get("playerId");
   const teamId = params.get("teamId");
@@ -17,7 +25,10 @@ export default function PlayerProfileScreen() {
   const {
     player,
     loading,
-    isCoach,
+    roles,
+    canEditRoles,
+    canRemoveMember,
+    canEditStats,
 
     selectedRoles,
     toggleRole,
@@ -34,51 +45,96 @@ export default function PlayerProfileScreen() {
     removeFromTeam,
   } = usePlayerProfile(teamId, playerId);
 
+  const initials = useMemo(() => {
+    const a = (player?.firstName ?? "").trim();
+    const b = (player?.lastName ?? "").trim();
+    const i1 = a ? a[0].toUpperCase() : "";
+    const i2 = b ? b[0].toUpperCase() : "";
+    return i1 + i2 || "?";
+  }, [player?.firstName, player?.lastName]);
+
   if (loading) {
     return (
-      <Card style={styles.center}>
+      <View style={styles.loadingWrap}>
         <ActivityIndicator size="large" />
-      </Card>
+      </View>
     );
   }
 
   if (!player) {
     return (
-      <Card style={styles.center}>
-        <Text>Žiadne údaje o hráčovi.</Text>
-      </Card>
+      <View style={styles.page}>
+        <Card style={styles.emptyCard}>
+          <Text variant="titleMedium">Žiadne údaje o hráčovi.</Text>
+          <Button
+            style={styles.mt16}
+            mode="contained"
+            onPress={() => router.back()}
+          >
+            Späť
+          </Button>
+        </Card>
+      </View>
     );
   }
 
-  const roles = Array.isArray(player.roles) ? player.roles : player.roles ? [player.roles] : [];
-  const rolesLabel =
-    roles.length === 0
-      ? "Žiadna rola"
-      : roles.includes("coach") && roles.includes("player")
-        ? "Tréner a Hráč"
-        : roles.includes("coach")
-          ? "Tréner"
-          : roles.includes("player")
-            ? "Hráč"
-            : roles.join(", ");
-
   return (
-    <Card style={styles.container}>
-      <Text>Meno: {player?.firstName || "---"}</Text>
-      <Text>Priezvisko: {player?.lastName || "---"}</Text>
-      <Text>Email: {player?.email || "---"}</Text>
+    <ScrollView style={styles.page} contentContainerStyle={styles.pageContent}>
+      {/* Profile card */}
+      <Card style={styles.profileCard} mode="elevated">
+        <View style={styles.profileTopRow}>
+          <Avatar.Text size={52} label={initials} />
+          <View style={styles.profileTextCol}>
+            <Text variant="titleLarge" style={styles.nameLine}>
+              {(player.firstName || "---") + " " + (player.lastName || "")}
+            </Text>
+            <Text variant="bodyMedium" style={styles.muted}>
+              {player.email || "—"}
+            </Text>
+          </View>
+        </View>
 
-      <Text style={{ marginTop: 20, fontWeight: "bold" }}>Role: {rolesLabel}</Text>
+        <Divider style={styles.divider} />
 
-      {isCoach && (
-        <RoleSelectorCard
-          selectedRoles={selectedRoles}
-          toggleRole={toggleRole}
-          onSave={updateRoles}
-        />
-      )}
+        <Text variant="titleMedium" style={styles.sectionTitle}>
+          Roly
+        </Text>
 
-      <PhysicalStatsCard player={player} isCoach={isCoach} onEdit={openEditModal} />
+        <View style={styles.chipsRow}>
+          {roles.length === 0 ? (
+            <Chip disabled style={styles.chip}>
+              Žiadna rola
+            </Chip>
+          ) : (
+            roles.map((r) => (
+              <Chip
+                key={r}
+                style={styles.chip}
+                icon={r === "coach" ? "whistle" : "account"}
+              >
+                {labelRole(r)}
+              </Chip>
+            ))
+          )}
+        </View>
+
+        {canEditRoles && (
+          <View style={styles.mt12}>
+            <RoleSelectorCard
+              selectedRoles={selectedRoles}
+              toggleRole={toggleRole}
+              onSave={updateRoles}
+            />
+          </View>
+        )}
+      </Card>
+
+      {/* Stats */}
+      <PhysicalStatsCard
+        player={player}
+        canEdit={canEditStats}
+        onEdit={openEditModal}
+      />
 
       <EditStatModal
         visible={modalVisible}
@@ -89,28 +145,28 @@ export default function PlayerProfileScreen() {
         onSave={saveStatValue}
       />
 
-      {isCoach && (
-        <Button
-          style={[styles.removeButton]}
-          onPress={removeFromTeam}
-        >
-          <Text style={styles.removeButtonText}>Odstrániť hráča z tímu</Text>
-        </Button>
+      {/* Danger zone */}
+      {canRemoveMember && (
+        <Card style={styles.dangerCard} mode="outlined">
+          <Text variant="titleMedium" style={styles.sectionTitle}>
+            Správa hráča
+          </Text>
+          <Text variant="bodyMedium" style={styles.muted}>
+            Odstránením hráča ho odoberieš z tímu. Dáta hráča v účte môžu zostať
+            zachované.
+          </Text>
+
+          <Button
+            mode="contained"
+            style={styles.mt16}
+            buttonColor="#d9534f"
+            onPress={removeFromTeam}
+            icon="account-remove"
+          >
+            Odstrániť hráča z tímu
+          </Button>
+        </Card>
       )}
-    </Card>
+    </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
-
-  removeButton: {
-    marginTop: 30,
-    backgroundColor: "#d9534f",
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  removeButtonText: { color: "white", fontWeight: "600", fontSize: 16 },
-});

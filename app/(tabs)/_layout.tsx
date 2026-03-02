@@ -1,4 +1,4 @@
-import { Tabs, useRouter, usePathname } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Button, Menu, Text } from "react-native-paper";
 import React, { useMemo, useState, useCallback } from "react";
@@ -9,7 +9,6 @@ import { useActiveTeam } from "@/hooks/useActiveTeam";
 
 export default function TabsLayout() {
   const router = useRouter();
-  const pathname = usePathname();
 
   const [teamMenuOpen, setTeamMenuOpen] = useState(false);
   const openMenu = useCallback(() => setTeamMenuOpen(true), []);

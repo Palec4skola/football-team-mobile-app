@@ -15,6 +15,7 @@ import {
   Unsubscribe,
 } from "firebase/firestore";
 import { db } from "../../firebase";
+import { TeamMemberModel } from "./UserRepo";
 
 export type TeamMember = {
   id: string; // userId
@@ -84,6 +85,32 @@ export const teamRepo = {
     );
 
     await updateDoc(doc(db, `users/${uid}`), { activeTeamId: teamId });
+  },
+  
+  async updateMemberRoles(
+    teamId: string,
+    userId: string,
+    roles: string[],
+  ): Promise<void> {
+    if (!teamId) throw new Error("Chýba teamId");
+    if (!userId) throw new Error("Chýba userId");
+    if (!Array.isArray(roles) || roles.length === 0) {
+      throw new Error("Používateľ musí mať aspoň jednu rolu.");
+    }
+
+    const memberRef = doc(db, "teams", teamId, "members", userId);
+
+    await updateDoc(memberRef, {
+      roles,
+      updatedAt: serverTimestamp(), // voliteľné, ale odporúčané
+    });
+  },
+
+  async getMemberById(teamId: string, userId: string): Promise<TeamMemberModel | null> {
+    const ref = doc(db, "teams", teamId, "members", userId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return null;
+    return snap.data() as TeamMemberModel;
   },
 
   async getTeamLevel(teamId: string) {

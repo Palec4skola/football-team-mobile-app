@@ -15,6 +15,11 @@ export type UserModel = {
   maxSpeed?: number | string;
   [key: string]: any;
 };
+export type TeamMemberModel = {
+  roles?: string[]; // napr. ["player"] | ["coach"] | ["player","coach"]
+  joinedAt?: any;
+  [key: string]: any;
+};
 
 function normalizeRoles(roles: unknown): string[] {
   if (Array.isArray(roles)) return roles;
@@ -24,21 +29,21 @@ function normalizeRoles(roles: unknown): string[] {
 
 export const userRepo = {
 
-  async getById(userId: string): Promise<UserModel | null> {
+  async getUserById(userId: string): Promise<UserModel | null> {
     const snap = await getDoc(doc(db, "users", userId));
     if (!snap.exists()) return null;
     return snap.data() as UserModel;
   },
 
   async getActiveTeamId(userId: string): Promise<string | null> {
-    const user = await this.getById(userId);
+    const user = await this.getUserById(userId);
     return user?.activeTeamId ?? null;
   },
-  async updateRoles(userId: string, roles: string[]) {
-    // await updateDoc(doc(db, "users", userId), {
-    //   roles: normalizeRoles(roles),
     // });
     //TODO: treba updatovat aj v membership dokumente
+  async updateRoles(teamId: string, userId: string, roles: string[]) {
+    const ref = doc(db, "teams", teamId, "members", userId);
+    await updateDoc(ref, { roles });
   },
 
  async setActiveTeamId(userId: string, teamId: string | null) {
