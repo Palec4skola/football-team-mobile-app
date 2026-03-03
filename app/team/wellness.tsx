@@ -29,7 +29,7 @@ export default function WellnessTeamScreen() {
 
   const goToPlayerDetail = (playerId: string) => {
     router.push({
-      pathname: "/team/wellness-player",
+      pathname: "/team/playerWellness",
       params: { teamId, playerId },
     });
   };

@@ -1,4 +1,4 @@
-import { collection, doc, onSnapshot, serverTimestamp, setDoc, Unsubscribe, getDocs } from "firebase/firestore";
+import { collection, doc, onSnapshot, serverTimestamp, setDoc, Unsubscribe, getDocs, getDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 
 export type AttendanceStatus = "yes" | "no" | "maybe";
@@ -42,5 +42,16 @@ export const attendanceRepo = {
     });
 
     return byUser;
+  },
+
+  async getPlayerAttendanceForTraining(
+    teamId: string,
+    trainingId: string,
+    playerId: string,
+  ): Promise<AttendanceDoc | null> {
+    const ref = doc(db, "teams", teamId, "trainings", trainingId, "attendance", playerId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return null;
+    return snap.data() as AttendanceDoc;
   },
 }

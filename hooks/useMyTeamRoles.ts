@@ -14,7 +14,6 @@ export function useMyTeamRoles(teamId?: string, userId?: string) {
     });
     return () => unsub();
   }, [teamId, userId]);
-
   const isCoach = useMemo(() => roles.includes("coach"), [roles]);
   return { roles, isCoach, loading };
 }
