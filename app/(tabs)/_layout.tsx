@@ -120,6 +120,15 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="alerts"
+        options={{
+          title: "Upozornenia",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="alert-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: "Profil",
@@ -128,6 +137,7 @@ export default function TabsLayout() {
           ),
         }}
       />
+      
     </Tabs>
   );
 }

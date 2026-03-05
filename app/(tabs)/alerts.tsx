@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { View } from "react-native";
-import { ActivityIndicator, Text } from "react-native-paper";
+import { ActivityIndicator, Text, Button } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { auth } from "@/firebase";
 import { userRepo } from "@/data/firebase/UserRepo";
@@ -33,10 +33,16 @@ export function getAlertRoute(input: RouteInput): any {
   };
 }
 export default function AlertsScreen() {
+  const uid = auth.currentUser?.uid;
   const router = useRouter();
   const { teamId } = useActiveTeam(); // alebo odkiaľ berieš aktívny tím
-const { lastReadAt } = useLastAlertsReadAt();
-const { alerts, loading } = useUnreadTeamAlerts(teamId, lastReadAt);
+  const { lastReadAt } = useLastAlertsReadAt();
+  const { alerts, loading } = useUnreadTeamAlerts(teamId, lastReadAt);
+  const unreadCount = alerts.filter(
+    (a) =>
+      a.createdAt &&
+      (!lastReadAt || a.createdAt.toMillis() > lastReadAt.toMillis()),
+  ).length;
   const items = useMemo(() => {
     if (!teamId) return [];
     return alerts.map((a) => ({
@@ -44,11 +50,6 @@ const { alerts, loading } = useUnreadTeamAlerts(teamId, lastReadAt);
       title: a.title,
       body: a.body,
       onPress: async () => {
-        const uid = auth.currentUser?.uid;
-
-        if (uid) {
-          await userRepo.markAlertsRead(uid);
-        }
         const route = getAlertRoute({
           targetKind: a.targetKind,
           teamId: a.teamId ?? teamId,
@@ -59,10 +60,10 @@ const { alerts, loading } = useUnreadTeamAlerts(teamId, lastReadAt);
     }));
   }, [alerts, router, teamId]);
 
-  if (!teamId) {
+  if (!teamId || !uid) {
     return (
       <View style={alertsStyles.emptyWrap}>
-        <Text>Najprv si vyber tím.</Text>
+        <Text>Najprv si vyber tím alebo sa prihláste.</Text>
       </View>
     );
   }
@@ -83,6 +84,12 @@ const { alerts, loading } = useUnreadTeamAlerts(teamId, lastReadAt);
   return (
     <View style={alertsStyles.screen}>
       <AlertsList items={items} />
+      <Button
+        onPress={() => userRepo.markAlertsRead(uid)}
+        disabled={unreadCount === 0}
+      >
+        Označiť všetko ako videné
+      </Button>
     </View>
   );
 }
