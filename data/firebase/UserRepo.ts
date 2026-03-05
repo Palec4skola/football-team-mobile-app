@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, setDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, updateDoc, setDoc, deleteDoc, serverTimestamp, Timestamp, Unsubscribe, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase";
 
 export type UserModel = {
@@ -74,5 +74,36 @@ export const userRepo = {
     const membershipRef = doc(db, "users", userId, "memberships", teamId);
   await deleteDoc(membershipRef);
   },
+
+  subscribeLastAlertsReadAt(
+    userId: string,
+    opts: {
+      onData: (ts: Timestamp | null) => void;
+      onError?: (e: unknown) => void;
+    }
+  ): Unsubscribe {
+    const ref = doc(db, "users", userId);
+
+    return onSnapshot(
+      ref,
+      (snap) => {
+        const data = snap.data() as any;
+        const ts = data?.lastAlertsReadAt;
+        opts.onData(ts instanceof Timestamp ? ts : null);
+      },
+      (err) => opts.onError?.(err)
+    );
+  },
+
+  async markAlertsRead(userId: string) {
+    await setDoc(
+      doc(db, "users", userId),
+      {
+        lastAlertsReadAt: Timestamp.now(),
+      },
+      { merge: true }
+    );
+  },
+
   normalizeRoles,
 };

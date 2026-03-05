@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { Alert } from "react-native";
 import { auth } from "@/firebase";
 import { trainingRepo } from "@/data/firebase/TrainingRepo";
+import { alertsRepo } from "@/data/firebase/AlertsRepo";
 
 export function useCreateTraining(teamId?: string | null) {
   const [name, setName] = useState("");
@@ -33,13 +34,23 @@ export function useCreateTraining(teamId?: string | null) {
 
     setSubmitting(true);
     try {
+      const uid = auth.currentUser?.uid;
+      if (!uid) throw new Error("Používateľ nie je prihlásený");
       const trainingId = await trainingRepo.create(teamId, {
         name,
         description,
         startsAt,
         createdBy: userId,
       });
-
+      await alertsRepo.create({
+  teamId,
+  type: "training_created",
+  title: "Nový tréning",
+  body: name,
+  targetKind: "training",
+  targetId: trainingId,
+  createdBy: uid,
+});
       // reset form
       setName("");
       setDescription("");

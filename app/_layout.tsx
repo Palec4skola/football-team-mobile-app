@@ -1,30 +1,57 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import {PaperProvider} from 'react-native-paper';
-// (nepotrebuješ anchor, môžeme ho odstrániť)
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import "react-native-reanimated";
+
+import React, { useMemo } from "react";
+import { View, StyleSheet } from "react-native";
+import { PaperProvider, Text } from "react-native-paper";
+
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  // const { expoPushToken, notification } = usePushNotifications();
+
+  // const notificationText = useMemo(() => {
+  //   if (!notification) return "";
+  //   try {
+  //     return JSON.stringify(notification, null, 2);
+  //   } catch {
+  //     return String(notification);
+  //   }
+  // }, [notification]);
+
+  // 🔧 prepni na false keď už nechceš vidieť token na obrazovke
+  const SHOW_PUSH_DEBUG = true;
 
   return (
     <PaperProvider>
+      {/* {SHOW_PUSH_DEBUG && (
+        <View style={styles.debugBox}>
+          <Text variant="labelSmall" selectable>
+            Token: {expoPushToken?.data ?? "(loading...)"}{" "}
+          </Text>
+          <Text variant="labelSmall" selectable>
+            Notification: {notificationText || "(none yet)"}
+          </Text>
+        </View>
+      )} */}
+
       <Stack screenOptions={{ headerShown: false }}>
-        {/* Login bude prvý po štarte aplikácie */}
-        <Stack.Screen name="login" options={{ headerShown: false, title: 'Prihlásenie' }} />
-
-        {/* Registrácia */}
-        <Stack.Screen name="register" options={{ headerShown: true, title: 'Registrácia' }} />
-
-        {/* Tabs (hlavná časť aplikácie po prihlásení) */}
+        <Stack.Screen name="login" options={{ headerShown: false, title: "Prihlásenie" }} />
+        <Stack.Screen name="register" options={{ headerShown: true, title: "Registrácia" }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
-        {/* Ostatné obrazovky mimo tabs, ak ich máš */}
-        <Stack.Screen name="chat-list" options={{ headerShown: true, title: 'Chaty' }} />
+        <Stack.Screen name="chat-list" options={{ headerShown: true, title: "Chaty" }} />
       </Stack>
 
       <StatusBar style="auto" />
     </PaperProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  debugBox: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 6,
+  },
+});

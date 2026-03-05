@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { Alert } from "react-native";
 import { matchRepo } from "@/data/firebase/MatchRepo";
+import { alertsRepo } from "@/data/firebase/AlertsRepo";
+import { auth } from "@/firebase";
 
 function norm(s: string) {
   return s.trim().replace(/\s+/g, " ");
@@ -35,14 +37,26 @@ export function useCreateMatch(teamId: string | null) {
     setErrorText(null);
 
     try {
-      await matchRepo.create(teamId, { opponent: o, place: p, date });
+      const uid = auth.currentUser?.uid;
+      if (!uid) throw new Error("Používateľ nie je prihlásený");
+      const matchId = await matchRepo.create(teamId, { opponent: o, place: p, date });
 
+      await alertsRepo.create({
+        teamId,
+        type: "match_created",
+        title: "Pridaný zápas",
+        body: `vs ${o}`,
+        targetKind: "match",
+        targetId: matchId,
+        createdBy: uid,
+      });
       setOpponent("");
       setPlace("");
       setDate(new Date());
 
       if (!opts?.silentSuccess) Alert.alert("Úspech", "Zápas bol pridaný");
       opts?.onSuccess?.();
+      
     } catch (e: any) {
       const msg = e?.message ?? "Nepodarilo sa pridať zápas";
       setErrorText(msg);

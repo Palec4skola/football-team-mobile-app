@@ -10,8 +10,11 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.instead"
-
+      "bundleIdentifier": "com.anonymous.instead",
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -22,7 +25,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.instead"
+      "package": "com.anonymous.instead",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "output": "static",
@@ -56,6 +60,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "0fdda533-514d-4912-b015-602b1fe7d62a"
+      }
+    },
+    "owner": "palinoo4"
   }
 }

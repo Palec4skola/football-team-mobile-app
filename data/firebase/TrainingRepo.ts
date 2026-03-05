@@ -59,6 +59,7 @@ export const trainingRepo = {
 
   async create(teamId: string, input: CreateTrainingInput) {
     const colRef = collection(db, "teams", teamId, "trainings");
+
     const trainingRef = doc(colRef);
 
     await setDoc(trainingRef, {
@@ -121,6 +122,9 @@ export const trainingRepo = {
     );
 
     const snap = await getDocs(qTrainings);
-    return snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })) as Training[];
+    return snap.docs.map((d) => ({
+      id: d.id,
+      ...(d.data() as any),
+    })) as Training[];
   },
 };
