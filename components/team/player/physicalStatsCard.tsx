@@ -2,14 +2,21 @@ import React from "react";
 import { View } from "react-native";
 import { Card, Text, IconButton } from "react-native-paper";
 import { styles } from "@/styles/physicalStatsCard.styles";
+import { UserStatKey } from "@/data/firebase/UserRepo";
 
-const STATS = [
+type StatItem = {
+  key: UserStatKey;
+  label: string;
+  unit: string;
+};
+
+const STATS: StatItem[] = [
   { key: "height", label: "Výška", unit: "cm" },
   { key: "weight", label: "Hmotnosť", unit: "kg" },
-  { key: "BMI", label: "BMI", unit: "" },
-  { key: "VO2max", label: "VO₂ max", unit: "" },
-  { key: "maxSpeed", label: "Najvyššia rýchlosť", unit: "" },
-] as const;
+  { key: "bmi", label: "BMI", unit: "" },
+  { key: "vo2max", label: "VO₂ max", unit: "" },
+  { key: "topSpeed", label: "Najvyššia rýchlosť", unit: "" },
+];
 
 function formatValue(v: any, unit?: string) {
   if (v === null || v === undefined || v === "") return "—";
@@ -23,7 +30,7 @@ export function PhysicalStatsCard({
 }: {
   player: Record<string, any>;
   canEdit: boolean;
-  onEdit: (statKey: string) => void;
+  onEdit: (statKey: UserStatKey) => void;
 }) {
   return (
     <Card style={styles.card} mode="elevated">
@@ -44,8 +51,8 @@ export function PhysicalStatsCard({
                 {label}
               </Text>
               <Text variant="titleMedium" style={styles.value}>
-                {formatValue(player?.[key], unit)}
-              </Text>
+  {formatValue(player?.stats?.[key], unit)}
+</Text>
             </View>
 
             {canEdit ? (

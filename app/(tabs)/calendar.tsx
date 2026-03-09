@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, FlatList, Pressable, ActivityIndicator } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import {useRouter } from "expo-router";
 import { CalendarList } from "react-native-calendars";
 import { useCalendarEventsRange } from "@/hooks/useCalendarEventRange";
 import { styles } from "@/styles/teamCalendar.styles";

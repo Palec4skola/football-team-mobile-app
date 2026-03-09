@@ -3,7 +3,7 @@ import { Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { auth } from "@/firebase";
 
-import { userRepo, UserModel } from "@/data/firebase/UserRepo";
+import { userRepo, UserModel, UserStatKey } from "@/data/firebase/UserRepo";
 import { teamRepo } from "@/data/firebase/TeamRepo";
 
 export type TeamMemberModel = {
@@ -40,7 +40,7 @@ export function usePlayerProfile(teamId: string | null, playerId: string | null)
 
   // modal state
   const [modalVisible, setModalVisible] = useState(false);
-  const [editingStatKey, setEditingStatKey] = useState<string | null>(null);
+  const [editingStatKey, setEditingStatKey] = useState<UserStatKey | null>(null);
   const [editingStatValue, setEditingStatValue] = useState("");
 
   useEffect(() => {
@@ -104,14 +104,14 @@ export function usePlayerProfile(teamId: string | null, playerId: string | null)
 
   const updateRoles = useCallback(async () => {
     if (!teamId || !playerId) return;
-    if (!canEditRoles) return; // ✅ guard
+    if (!canEditRoles) return;
     if (selectedRoles.length === 0) {
       Alert.alert("Chyba", "Hráč musí mať aspoň jednu rolu.");
       return;
     }
 
     try {
-      await teamRepo.updateMemberRoles(teamId, playerId, selectedRoles); // ✅ do teams/members
+      await teamRepo.updateMemberRoles(teamId, playerId, selectedRoles);
       setMember((prev) => ({ ...(prev ?? {}), roles: selectedRoles }));
       Alert.alert("Úspech", "Roly boli uložené.");
     } catch (e: any) {
@@ -121,8 +121,8 @@ export function usePlayerProfile(teamId: string | null, playerId: string | null)
 
   // --- Stats modal
   const openEditModal = useCallback(
-    (statKey: string) => {
-      if (!canEditStats) return; // ✅ guard
+    (statKey: UserStatKey) => {
+      if (!canEditStats) return;
       setEditingStatKey(statKey);
       setEditingStatValue(player?.[statKey]?.toString?.() ?? "");
       setModalVisible(true);
@@ -150,7 +150,7 @@ export function usePlayerProfile(teamId: string | null, playerId: string | null)
     if (!trimmed) return;
 
     try {
-      await userRepo.updateStat(playerId, editingStatKey, trimmed); // ✅ do users (štatistiky)
+      await userRepo.updateStat(playerId, editingStatKey, trimmed); 
       setPlayer((prev) => (prev ? { ...prev, [editingStatKey]: trimmed } : prev));
       Alert.alert("Úspech", "Štatistika bola aktualizovaná.");
     } catch (e: any) {

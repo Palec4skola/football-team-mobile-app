@@ -16,10 +16,17 @@ export type UserModel = {
   [key: string]: any;
 };
 export type TeamMemberModel = {
-  roles?: string[]; // napr. ["player"] | ["coach"] | ["player","coach"]
+  roles?: string[];
   joinedAt?: any;
   [key: string]: any;
 };
+
+export type UserStatKey =
+  | "height"
+  | "weight"
+  | "bmi"
+  | "vo2max"
+  | "topSpeed";
 
 function normalizeRoles(roles: unknown): string[] {
   if (Array.isArray(roles)) return roles;
@@ -50,10 +57,11 @@ export const userRepo = {
   await updateDoc(doc(db, "users", userId), { activeTeamId: teamId });
 },
 
-  async updateStat(userId: string, statKey: string, value: string) {
-    // await this.update(userId, {
-    //   [statKey]: value,
-    // });
+  async updateStat(userId: string, statKey: UserStatKey, value: string) {
+    const userRef = doc(db,"users",userId);
+    await updateDoc(userRef, {
+    [`stats.${statKey}`]: value,
+  });
   },
   async addMembership(userId: string, teamId: string, teamName: string, roles: string[]) {
     const userMembershipRef = doc(db, "users", userId, "memberships", teamId);
