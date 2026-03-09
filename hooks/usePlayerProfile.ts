@@ -55,9 +55,9 @@ export function usePlayerProfile(teamId: string | null, playerId: string | null)
       setLoading(true);
       try {
         const [u, targetMember, vMember] = await Promise.all([
-          userRepo.getUserById(playerId),          // ✅ user doc (štatistiky)
-          teamRepo.getMemberById(teamId, playerId), // ✅ roly targeta v tíme
-          teamRepo.getMemberById(teamId, viewerId), // ✅ roly viewer-a v tíme
+          userRepo.getUserById(playerId),
+          teamRepo.getMemberById(teamId, playerId),
+          teamRepo.getMemberById(teamId, viewerId),
         ]);
 
         if (cancelled) return;
