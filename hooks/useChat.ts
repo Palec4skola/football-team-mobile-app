@@ -6,10 +6,16 @@ import {
   TeamChatMessage,
   teamChatRepo,
 } from "@/data/firebase/ChatRepo";
+import { useUserProfile, UserProfile } from "./useUserProfile";
 
-function getFallbackSenderName() {
+function getFallbackSenderName(profile: UserProfile | null) {
   const user = auth.currentUser;
-  return user?.displayName || user?.email || "Používateľ";
+
+  if (!profile) {
+    return user?.email || "Používateľ";
+  }
+
+  return `${profile.firstName} ${profile.lastName}`;
 }
 
 export function useTeamChat(teamId: string | null) {
@@ -17,12 +23,13 @@ export function useTeamChat(teamId: string | null) {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [text, setText] = useState("");
+  const {profile} = useUserProfile(auth.currentUser!.uid);
 
   useEffect(() => {
     if (!teamId) {
       setMessages([]);
       setLoading(false);
-      return;
+      return;   
     }
 
     setLoading(true);
@@ -52,7 +59,7 @@ export function useTeamChat(teamId: string | null) {
 
       await teamChatRepo.sendMessage({
         teamId,
-        senderName: getFallbackSenderName(),
+        senderName: getFallbackSenderName(profile),
         text,
       });
 

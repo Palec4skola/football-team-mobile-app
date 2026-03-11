@@ -7,8 +7,7 @@ export type UserProfile = {
   firstName?: string;
   lastName?: string;
   photoURL?: string;
-  roles?: string[]; // ak máš aj globálne roly, inak kľudne zmaž
-  // ...ďalšie fields podľa toho, čo máš v users
+  roles?: string[];
 };
 
 export function useUserProfile(userId: string | null) {

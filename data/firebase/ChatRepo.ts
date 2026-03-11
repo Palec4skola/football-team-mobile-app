@@ -22,7 +22,7 @@ export type TeamChatMessage = {
 
 type SendMessageInput = {
   teamId: string;
-  senderName: string;
+  senderName: string | undefined;
   text: string;
 };
 
