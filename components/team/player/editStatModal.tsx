@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Modal, View } from "react-native";
+import { Modal, View, KeyboardAvoidingView } from "react-native";
 import { Card, Text, TextInput, Button, IconButton } from "react-native-paper";
 import { styles } from "@/styles/editStatModal.styles";
 
@@ -24,8 +24,13 @@ export function EditStatModal({
   }, [statKey, value]);
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
-      <View style={styles.backdrop}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onCancel}
+    >
+      <KeyboardAvoidingView style={styles.backdrop}>
         <Card style={styles.sheet} mode="elevated">
           <View style={styles.sheetHeader}>
             <View style={styles.headerText}>
@@ -57,7 +62,7 @@ export function EditStatModal({
             </Button>
           </View>
         </Card>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

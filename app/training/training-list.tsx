@@ -5,18 +5,19 @@ import { useSearchParams } from "expo-router/build/hooks";
 import React from "react";
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
 import { Button, Card, Text } from "react-native-paper";
-import { useUserRole } from "../../hooks/useUserRole";
+import { useMyTeamRoles } from "@/hooks/useMyTeamRoles";
+import { auth } from "@/firebase"
 
 export default function TrainingListScreen() {
   const router = useRouter();
   const params = useSearchParams();
-  const teamId = params.get("teamId");
+  const teamId = params.get("teamId")?? undefined;
 
-  const { trainings, loading } = useTeamTrainings(teamId);
-  const { isCoach, loadingRole } = useUserRole();
+  const { trainings,loading } = useTeamTrainings(teamId);
+const {isCoach,loadingRoles } = useMyTeamRoles(teamId,auth.currentUser?.uid);
   const { deleteTraining } = useTrainingActions(teamId);
 
-  if (loading || loadingRole) {
+  if (loading || loadingRoles) {
     return (
       <View style={styles.center}>
         <ActivityIndicator />

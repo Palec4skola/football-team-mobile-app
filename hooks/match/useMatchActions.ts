@@ -2,7 +2,7 @@
 import { Alert } from "react-native";
 import { matchRepo } from "@/data/firebase/MatchRepo";
 
-export function useMatchActions(teamId: string | null) {
+export function useMatchActions(teamId: string | undefined) {
   async function deleteMatch(matchId: string) {
     if (!teamId) return;
 

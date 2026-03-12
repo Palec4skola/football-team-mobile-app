@@ -35,7 +35,7 @@ export default function LoginScreen() {
       Alert.alert('Úspech', `Prihlásenie úspešné.`);
       
       // 3️⃣ Presmerovanie do hlavnej sekcie aplikácie
-      router.replace('/(tabs)');
+      router.replace('/(tabs)/home');
     } catch (error: any) {
       Alert.alert('Chyba', error.message);
     }

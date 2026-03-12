@@ -7,18 +7,19 @@ import { useSearchParams } from "expo-router/build/hooks";
 
 import { useTeamMatches } from "@/hooks/match/useTeamMatches";
 import { useMatchActions } from "@/hooks/match/useMatchActions";
-import { useUserRole } from "@/hooks/useUserRole";
+import { useMyTeamRoles } from "@/hooks/useMyTeamRoles";
+import { auth } from "@/firebase"
 
 export default function MatchListScreen() {
   const router = useRouter();
   const params = useSearchParams();
-  const teamId = params.get("teamId");
+  const teamId = params.get("teamId") ?? undefined;
 
   const { matches, loading } = useTeamMatches(teamId);
-  const { isCoach, loadingRole } = useUserRole();
+  const { isCoach, loadingRoles } = useMyTeamRoles(teamId,auth.currentUser?.uid);
   const { deleteMatch } = useMatchActions(teamId);
 
-  if (loading || loadingRole) {
+  if (loading || loadingRoles) {
     return (
       <View style={styles.center}>
         <ActivityIndicator />
