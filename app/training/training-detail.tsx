@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { View } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
 import { auth } from "../../firebase";
@@ -11,7 +11,10 @@ import { useAttendance } from "@/hooks/useAttendance";
 
 import { AttendanceButtons } from "@/components/attendance/attendanceButtons";
 import { PlayersTable } from "@/components/team/playersTable";
-import { attendanceRepo, AttendanceStatus } from "@/data/firebase/AttendanceRepo";
+import {
+  attendanceRepo,
+  AttendanceStatus,
+} from "@/data/firebase/AttendanceRepo";
 
 export default function TrainingDetailScreen() {
   const router = useRouter();
@@ -22,17 +25,23 @@ export default function TrainingDetailScreen() {
 
   const userId = auth.currentUser?.uid;
 
+  useEffect(() => {
+    if (!teamId || !trainingId) {
+      router.back();
+    }
+  }, [teamId, trainingId, router]);
+
   const { training, loading: loadingTraining } = useTraining(
     teamId,
-    trainingId,
+    trainingId
   );
   const { members, loading: loadingMembers } = useTeamMembers(teamId);
   const { byUserId, loading: loadingAtt } = useAttendance(
     teamId,
     trainingId,
-    "trainings",
+    "trainings"
   );
-  const { isCoach, loading: loadingRoles } = useMyTeamRoles(teamId, userId);
+  const { isCoach, loadingRoles } = useMyTeamRoles(teamId, userId);
 
   const loading =
     loadingTraining || loadingMembers || loadingAtt || loadingRoles;
@@ -45,7 +54,6 @@ export default function TrainingDetailScreen() {
   }, [training?.startsAt]);
 
   if (!teamId || !trainingId) {
-    router.back();
     return null;
   }
 
@@ -67,8 +75,17 @@ export default function TrainingDetailScreen() {
 
   const canEdit = (rowUserId: string) => isCoach || rowUserId === userId;
 
-  const setAttendance = async (rowUserId: string, status: AttendanceStatus) => {
-    await attendanceRepo.setAttendance(teamId, trainingId, "trainings", rowUserId, status);
+  const setAttendance = async (
+    rowUserId: string,
+    status: AttendanceStatus
+  ) => {
+    await attendanceRepo.setAttendance(
+      teamId,
+      trainingId,
+      "trainings",
+      rowUserId,
+      status
+    );
   };
 
   return (
@@ -83,9 +100,7 @@ export default function TrainingDetailScreen() {
       >
         <Text variant="titleMedium">{training.name}</Text>
         <Text>Dátum: {formattedDate}</Text>
-        {training.description ? (
-          <Text>Popis: {training.description}</Text>
-        ) : null}
+        {training.description ? <Text>Popis: {training.description}</Text> : null}
       </View>
 
       <Text variant="titleMedium" style={{ marginBottom: 8 }}>
@@ -94,10 +109,7 @@ export default function TrainingDetailScreen() {
 
       <PlayersTable
         members={members}
-        onPressPlayer={(id) => {
-          // napr. detail hráča alebo nič
-          // router.push({ pathname: "/team/player-detail", params: { teamId, userId: id } });
-        }}
+        onPressPlayer={(id) => {}}
         renderRight={(player) => {
           const current = byUserId[player.id]?.status ?? "maybe";
           return (

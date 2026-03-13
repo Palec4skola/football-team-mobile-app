@@ -1,5 +1,10 @@
 import React from "react";
-import { Platform, View } from "react-native";
+import {
+  Platform,
+  View,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { styles } from "@/styles/trainingForm.styles";
@@ -31,64 +36,66 @@ export function TrainingForm({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.title}>Nový tréning</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        <View style={styles.card}>
+          <Text style={styles.title}>Nový tréning</Text>
 
-        <View style={styles.fieldWrapper}>
-          <Text style={styles.label}>Názov tréningu</Text>
-          <TextInput
-            value={name}
-            onChangeText={onChangeName}
-            mode="outlined"
-            style={styles.input}
-            placeholder="Napr. Kondičný tréning"
-          />
-        </View>
-
-        <View style={styles.fieldWrapper}>
-          <Text style={styles.label}>Dátum</Text>
-          <Button
-            mode="outlined"
-            onPress={() => setShowPicker(true)}
-            style={styles.dateButton}
-          >
-            {startsAt.toLocaleDateString()}
-          </Button>
-
-          {showPicker && (
-            <DateTimePicker
-              value={startsAt}
-              mode="date"
-              display="default"
-              onChange={onChangeDate}
+          <View style={styles.fieldWrapper}>
+            <Text style={styles.label}>Názov tréningu</Text>
+            <TextInput
+              value={name}
+              onChangeText={onChangeName}
+              mode="outlined"
+              style={styles.input}
+              placeholder="Napr. Kondičný tréning"
             />
-          )}
-        </View>
+          </View>
 
-        <View style={styles.fieldWrapper}>
-          <Text style={styles.label}>Popis</Text>
-          <TextInput
-            value={description}
-            onChangeText={onChangeDescription}
-            mode="outlined"
-            multiline
-            numberOfLines={4}
-            style={styles.input}
-            placeholder="Čo sa bude robiť?"
-          />
-        </View>
+          <View style={styles.fieldWrapper}>
+            <Text style={styles.label}>Dátum</Text>
+            <Button
+              mode="outlined"
+              onPress={() => setShowPicker(true)}
+              style={styles.dateButton}
+            >
+              {startsAt.toLocaleDateString()}
+            </Button>
 
-        <Button
-          mode="contained"
-          loading={submitting}
-          disabled={submitting}
-          onPress={onSubmit}
-          style={styles.submitButton}
-        >
-          {submitting ? "Pridávam..." : "Pridať tréning"}
-        </Button>
+            {showPicker && (
+              <DateTimePicker
+                value={startsAt}
+                mode="date"
+                display="default"
+                onChange={onChangeDate}
+              />
+            )}
+          </View>
+
+          <View style={styles.fieldWrapper}>
+            <Text style={styles.label}>Popis</Text>
+            <TextInput
+              value={description}
+              onChangeText={onChangeDescription}
+              mode="outlined"
+              multiline
+              numberOfLines={4}
+              style={styles.input}
+              placeholder="Čo sa bude robiť?"
+            />
+          </View>
+
+          <Button
+            mode="contained"
+            loading={submitting}
+            disabled={submitting}
+            onPress={onSubmit}
+            style={styles.submitButton}
+          >
+            {submitting ? "Pridávam..." : "Pridať tréning"}
+          </Button>
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }

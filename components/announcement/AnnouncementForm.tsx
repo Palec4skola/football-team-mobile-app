@@ -7,6 +7,8 @@ import {
   Text,
   TextInput,
   View,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 
 type Props = {
@@ -29,37 +31,39 @@ export function AnnouncementForm({
   onSubmit,
 }: Props) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Názov</Text>
-      <TextInput
-        value={title}
-        onChangeText={setTitle}
-        placeholder="Zadaj názov oznámenia"
-        style={styles.input}
-      />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        <Text style={styles.label}>Názov</Text>
+        <TextInput
+          value={title}
+          onChangeText={setTitle}
+          placeholder="Zadaj názov oznámenia"
+          style={styles.input}
+        />
 
-      <Text style={styles.label}>Text oznámenia</Text>
-      <TextInput
-        value={content}
-        onChangeText={setContent}
-        placeholder="Zadaj text oznámenia"
-        style={[styles.input, styles.textarea]}
-        multiline
-        textAlignVertical="top"
-      />
+        <Text style={styles.label}>Text oznámenia</Text>
+        <TextInput
+          value={content}
+          onChangeText={setContent}
+          placeholder="Zadaj text oznámenia"
+          style={[styles.input, styles.textarea]}
+          multiline
+          textAlignVertical="top"
+        />
 
-      <Pressable
-        style={[styles.button, saving && styles.buttonDisabled]}
-        onPress={onSubmit}
-        disabled={saving}
-      >
-        {saving ? (
-          <ActivityIndicator />
-        ) : (
-          <Text style={styles.buttonText}>{submitLabel}</Text>
-        )}
-      </Pressable>
-    </View>
+        <Pressable
+          style={[styles.button, saving && styles.buttonDisabled]}
+          onPress={onSubmit}
+          disabled={saving}
+        >
+          {saving ? (
+            <ActivityIndicator />
+          ) : (
+            <Text style={styles.buttonText}>{submitLabel}</Text>
+          )}
+        </Pressable>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 

@@ -24,7 +24,7 @@ export default function MatchDetailScreen() {
   const { match, loading: loadingMatch } = useMatch(teamId, matchId);
   const { members, loading: loadingMembers } = useTeamMembers(teamId);
   const { byUserId, loading: loadingAtt } = useAttendance(teamId, matchId, "matches");
-  const { isCoach, loading: loadingRoles } = useMyTeamRoles(teamId, userId);
+  const { isCoach, loadingRoles } = useMyTeamRoles(teamId, userId);
 
   const loading = loadingMatch || loadingMembers || loadingAtt || loadingRoles;
 

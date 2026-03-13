@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Alert } from 'react-native';
+import { View, Alert,TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { TextInput, Text, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { auth, db } from '../firebase'; // uprav podľa cesty
@@ -18,23 +18,20 @@ export default function LoginScreen() {
     }
 
     try {
-      // 1️⃣ Prihlásenie pomocou Firebase Auth
+      // Prihlásenie pomocou Firebase Auth
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 2️⃣ Načítanie používateľských dát (napr. role) z Firestore
+      // Načítanie používateľských dát (napr. role) z Firestore
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (!userDoc.exists()) {
         Alert.alert('Chyba', 'Používateľské údaje nenájdené');
         return;
       }
 
-      const userData = userDoc.data();
-      const role = userData?.role || 'player';
-
       Alert.alert('Úspech', `Prihlásenie úspešné.`);
       
-      // 3️⃣ Presmerovanie do hlavnej sekcie aplikácie
+      // Presmerovanie do hlavnej sekcie aplikácie
       router.replace('/(tabs)/home');
     } catch (error: any) {
       Alert.alert('Chyba', error.message);
@@ -42,6 +39,7 @@ export default function LoginScreen() {
   };
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <View style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
       <Text style={{ fontSize: 26, fontWeight: 'bold', marginBottom: 30, textAlign: 'center' }}>
         Prihlásenie
@@ -89,5 +87,6 @@ export default function LoginScreen() {
         </Text>
       </View>
     </View>
+    </TouchableWithoutFeedback>
   );
 }

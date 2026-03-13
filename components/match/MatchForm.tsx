@@ -1,7 +1,7 @@
 // src/features/matches/components/MatchForm.tsx
 import React, { useState } from "react";
-import { Platform, StyleSheet, View } from "react-native";
-import { Button, Text, TextInput, HelperText } from "react-native-paper";
+import { Platform, View, TouchableWithoutFeedback, Keyboard } from "react-native";
+import { Button, Text, TextInput } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { styles } from "@/styles/trainingForm.styles";
 
@@ -41,10 +41,8 @@ export function MatchForm({
     if (selected) setDate(selected);
   };
 
-  const oppOk = opponent.trim().length > 0;
-  const placeOk = place.trim().length > 0;
-
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <View style={styles.container}>
       <View style={styles.card}>
         <Text style={styles.title}>Pridať zápas</Text>
@@ -104,5 +102,6 @@ export function MatchForm({
         </Button>
       </View>
     </View>
+    </TouchableWithoutFeedback>
   );
 }
