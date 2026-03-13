@@ -20,7 +20,7 @@ export default function TeamManagement() {
 
   const handleAddPlayer = () => {
     router.push({
-      pathname: "/create-join-team/generate-code",
+      pathname: "/team/generate-code",
       params: { teamId },
     });
   };

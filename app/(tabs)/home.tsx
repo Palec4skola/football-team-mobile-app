@@ -50,7 +50,7 @@ export default function HomeScreen() {
           <Text>Pridať sa do tímu</Text>
         </Button>
 
-        <Button onPress={() => router.push("/create-join-team/create-team")}>
+        <Button onPress={() => router.push("/team/CreateTeamScreen")}>
           <Text>Vytvoriť tím</Text>
         </Button>
       </View>

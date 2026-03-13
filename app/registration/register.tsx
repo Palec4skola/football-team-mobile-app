@@ -1,130 +1,212 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, Alert } from 'react-native';
-import { Text } from 'react-native-paper';
-import { useRouter } from 'expo-router';
-// Uprav cestu podľa tvojho projektu, napr. '@/firebase' alebo './firebase'
-import { auth, db } from '../../firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import React, { useState } from "react";
+import {
+  View,
+  TextInput,
+  Alert,
+  TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
+import { Text, Button, Card } from "react-native-paper";
+import { useRouter } from "expo-router";
+import { auth, db } from "../../firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function RegisterScreen() {
   const router = useRouter();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
 
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
-    if (!email || !password || !confirmPassword) {
-      Alert.alert('Chyba', 'Vyplň všetky polia');
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+      Alert.alert("Chyba", "Vyplň všetky polia");
       return;
     }
+
     if (password !== confirmPassword) {
-      Alert.alert('Chyba', 'Heslá sa nezhodujú');
+      Alert.alert("Chyba", "Heslá sa nezhodujú");
       return;
     }
 
     try {
-      // 1️⃣ Vytvorenie používateľa v Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      setLoading(true);
+
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email.trim(),
+        password
+      );
       const user = userCredential.user;
 
-      // 2️⃣ Uloženie údajov do Firestore
-      await setDoc(doc(db, 'users', user.uid), {
-        firstName: firstName,
-        lastName: lastName,
+      await setDoc(doc(db, "users", user.uid), {
+        firstName,
+        lastName,
         email: user.email,
         createdAt: new Date(),
       });
 
-      Alert.alert('Úspech', `Registrácia prebehla úspešne!`);
-      router.replace('/registration/choose-join-or-create');
+      Alert.alert("Úspech", "Registrácia prebehla úspešne!");
+      router.replace("/registration/choose-join-or-create");
     } catch (error: any) {
-      Alert.alert('Chyba', error.message);
+      Alert.alert("Chyba", error.message ?? "Niečo sa pokazilo");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
-      <Text style={{ fontSize: 26, fontWeight: 'bold', marginBottom: 30, textAlign: 'center' }}>
-        Registrácia
-      </Text>
-      <Text>Meno</Text>
-      <TextInput
-        style={styles.input}
-        value={firstName}
-        onChangeText={setFirstName}
-      />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAvoidingView
+        style={styles.screen}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={20}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <Text style={styles.title}>Registrácia</Text>
+            <Text style={styles.subtitle}>
+              Vytvor si účet a pokračuj do aplikácie.
+            </Text>
+          </View>
 
-      <Text>Priezvisko</Text>
-      <TextInput
-        style={styles.input}
-        value={lastName}
-        onChangeText={setLastName}
-      />
+          <Card style={styles.card} mode="elevated">
+            <View style={styles.cardInner}>
+              <Text style={styles.label}>Meno</Text>
+              <TextInput
+                style={styles.input}
+                value={firstName}
+                onChangeText={setFirstName}
+                placeholder="Zadaj meno"
+                returnKeyType="next"
+              />
 
-      <Text>Email</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="napr. test@tim.sk"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        value={email}
-        onChangeText={setEmail}
-      />
+              <Text style={styles.label}>Priezvisko</Text>
+              <TextInput
+                style={styles.input}
+                value={lastName}
+                onChangeText={setLastName}
+                placeholder="Zadaj priezvisko"
+                returnKeyType="next"
+              />
 
-      <Text>Heslo</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Zadaj heslo"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="napr. test@tim.sk"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                value={email}
+                onChangeText={setEmail}
+                returnKeyType="next"
+              />
 
-      <Text>Potvrď heslo</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Zadaj heslo znova"
-        secureTextEntry
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-      />
+              <Text style={styles.label}>Heslo</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Zadaj heslo"
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+                returnKeyType="next"
+              />
 
-      <Button title="Registrovať sa" onPress={handleRegister} />
-    </View>
+              <Text style={styles.label}>Potvrď heslo</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Zadaj heslo znova"
+                secureTextEntry
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                returnKeyType="done"
+                onSubmitEditing={handleRegister}
+              />
+
+              <Button
+                mode="contained"
+                onPress={handleRegister}
+                loading={loading}
+                disabled={loading}
+                style={styles.submitButton}
+                contentStyle={styles.submitButtonContent}
+              >
+                Registrovať sa
+              </Button>
+            </View>
+          </Card>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
 
-import { StyleSheet } from 'react-native';
-
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: "#F6F7FB",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    padding: 20,
+  },
+  header: {
+    marginBottom: 18,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "800",
+    textAlign: "center",
+    color: "#111827",
+    marginBottom: 6,
+  },
+  subtitle: {
+    fontSize: 14,
+    textAlign: "center",
+    color: "#6B7280",
+  },
+  card: {
+    borderRadius: 22,
+  },
+  cardInner: {
+    padding: 18,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#374151",
+    marginBottom: 8,
+    marginTop: 2,
+  },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 15,
+    borderColor: "#D1D5DB",
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginBottom: 14,
+    fontSize: 15,
+    color: "#111827",
   },
-  roleButton: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#007AFF',
-    borderRadius: 8,
-    paddingVertical: 10,
-    marginHorizontal: 5,
-    alignItems: 'center',
+  submitButton: {
+    marginTop: 8,
+    borderRadius: 12,
   },
-  roleButtonSelected: {
-    backgroundColor: '#007AFF',
-  },
-  roleText: {
-    color: '#007AFF',
-    fontWeight: '500',
-  },
-  roleTextSelected: {
-    color: 'white',
+  submitButtonContent: {
+    paddingVertical: 6,
   },
 });
