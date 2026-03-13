@@ -29,7 +29,7 @@ export default function CreateTeamScreen() {
 
     setLoading(true);
     try {
-      const teamId = await createTeam({
+      await createTeam({
         name,
         country: c,
         level,
@@ -37,7 +37,7 @@ export default function CreateTeamScreen() {
       });
 
       Alert.alert("Úspech", `Tím '${name}' bol vytvorený`);
-      router.replace({ "pathname": "/(tabs)"});
+      router.replace("/(tabs)/home");
     } catch (e: any) {
       Alert.alert("Chyba", e?.message ?? "Niečo sa pokazilo");
     } finally {

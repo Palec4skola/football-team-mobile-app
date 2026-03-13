@@ -1,7 +1,13 @@
 import React from "react";
 import { ScrollView, View } from "react-native";
-import { Card, Text, TouchableRipple, useTheme } from "react-native-paper";
-import { homeStyles as s } from "@/styles/home.styles";
+import {
+  Card,
+  Text,
+  TouchableRipple,
+  useTheme,
+} from "react-native-paper";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { homeStyles as s } from "@/styles/homeAmater.styles"
 
 type props = {
   onGoTrainings: () => void;
@@ -38,109 +44,84 @@ export default function HomeAmateur({
 }: props) {
   const theme = useTheme();
 
-  return (
-    <ScrollView style={s.screen} contentContainerStyle={s.content}>
-      <Text style={s.title}>Domov</Text>
+  
 
-      {/* Tréning */}
-      <Card style={s.card} mode="elevated">
-        <TouchableRipple onPress={onGoTrainings} borderless>
-          <View style={s.cardInner}>
-            <View style={s.cardTopRow}>
-              <Text style={s.cardTitle}>Tréningy</Text>
-              <View
-                style={[
-                  s.badge,
-                  { backgroundColor: theme.colors.primaryContainer },
-                ]}
-              >
-                <Text style={[s.badgeText, { color: theme.colors.onPrimaryContainer }]}>
-                  Najbližšie
-                </Text>
-              </View>
-            </View>
+return (
+  <ScrollView style={s.screen} contentContainerStyle={s.content}>
+    <Text style={s.title}>Domov</Text>
+    <Text style={s.subtitle}>Prehľad tímových aktivít</Text>
 
-            <Text style={s.strongLine}>
-              {nextActivity.type} • {nextActivity.date} o {nextActivity.time}
+    {/* TRÉNINGY */}
+    <Card style={[s.card, { borderLeftColor: "#3B82F6" }]} mode="elevated">
+      <TouchableRipple onPress={onGoTrainings} borderless>
+        <View style={s.cardInner}>
+          <View style={s.cardHeader}>
+            <MaterialCommunityIcons name="calendar-clock" size={24} color="#3B82F6" />
+            <Text style={s.cardTitle}>Tréningy</Text>
+          </View>
+
+          <Text style={s.strongLine}>
+            {nextActivity.type} • {nextActivity.date} o {nextActivity.time}
+          </Text>
+
+          <Text style={s.line}>Miesto: {nextActivity.place}</Text>
+        </View>
+      </TouchableRipple>
+    </Card>
+
+    {/* ZÁPASY */}
+    <Card style={[s.card, { borderLeftColor: "#F97316" }]} mode="elevated">
+      <TouchableRipple onPress={onGoMatches} borderless>
+        <View style={s.cardInner}>
+          <View style={s.cardHeader}>
+            <MaterialCommunityIcons name="soccer" size={24} color="#F97316" />
+            <Text style={s.cardTitle}>Posledný zápas</Text>
+          </View>
+
+          <Text style={s.line}>Súper: {lastResult.opponent}</Text>
+          <Text style={s.line}>Dátum: {lastResult.date}</Text>
+          <Text style={s.strongLine}>Skóre: {lastResult.score}</Text>
+        </View>
+      </TouchableRipple>
+    </Card>
+
+    {/* OZNÁMENIA */}
+    <Card style={[s.card, { borderLeftColor: "#7C3AED" }]} mode="elevated">
+      <TouchableRipple onPress={onGoAnnouncements} borderless>
+        <View style={s.cardInner}>
+          <View style={s.cardHeader}>
+            <MaterialCommunityIcons name="bullhorn-outline" size={24} color="#7C3AED" />
+            <Text style={s.cardTitle}>Tímové oznámenia</Text>
+          </View>
+
+          {announcements.slice(0, 3).map((msg, idx) => (
+            <Text key={idx} style={s.line}>
+              • {msg}
             </Text>
-            <Text style={s.line}>Miesto: {nextActivity.place}</Text>
-          </View>
-        </TouchableRipple>
-      </Card>
+          ))}
+        </View>
+      </TouchableRipple>
+    </Card>
 
-      {/* Zápas */}
-      <Card style={s.card} mode="elevated">
-        <TouchableRipple onPress={onGoMatches} borderless>
-          <View style={s.cardInner}>
-            <View style={s.cardTopRow}>
-              <Text style={s.cardTitle}>Posledný výsledok</Text>
-              <View
-                style={[
-                  s.badge,
-                  { backgroundColor: theme.colors.secondaryContainer },
-                ]}
-              >
-                <Text style={[s.badgeText, { color: theme.colors.onSecondaryContainer }]}>
-                  {lastResult.result}
-                </Text>
-              </View>
-            </View>
-
-            <Text style={s.line}>Zápas proti: {lastResult.opponent}</Text>
-            <Text style={s.line}>Dátum: {lastResult.date}</Text>
-            <Text style={s.strongLine}>Skóre: {lastResult.score}</Text>
+    {/* DOCHÁDZKA */}
+    <Card style={[s.card, { borderLeftColor: "#10B981" }]} mode="elevated">
+      <TouchableRipple onPress={onGoAttendance} borderless>
+        <View style={s.cardInner}>
+          <View style={s.cardHeader}>
+            <MaterialCommunityIcons
+              name="clipboard-check-outline"
+              size={24}
+              color="#10B981"
+            />
+            <Text style={s.cardTitle}>Dochádzka</Text>
           </View>
-        </TouchableRipple>
-      </Card>
 
-      {/* Oznámenia */}
-      <Card style={s.card} mode="elevated">
-        <TouchableRipple onPress={onGoAnnouncements} borderless>
-          <View style={s.cardInner}>
-            <View style={s.cardTopRow}>
-              <Text style={s.cardTitle}>Tímové oznámenia</Text>
-              <View
-                style={[
-                  s.badge,
-                  { backgroundColor: theme.colors.tertiaryContainer },
-                ]}
-              >
-                <Text style={[s.badgeText, { color: theme.colors.onTertiaryContainer }]}>
-                  {announcements.length}
-                </Text>
-              </View>
-            </View>
-
-            {announcements.slice(0, 3).map((msg, idx) => (
-              <View key={idx} style={s.bulletRow}>
-                <Text style={s.bulletDot}>•</Text>
-                <Text style={s.bulletText}>{msg}</Text>
-              </View>
-            ))}
-          </View>
-        </TouchableRipple>
-      </Card>
-      
-      <Card style={s.card} mode="elevated">
-        <TouchableRipple onPress={onGoAttendance} borderless>
-          <View style={s.cardInner}>
-            <View style={s.cardTopRow}>
-              <Text style={s.cardTitle}>Dochádzka hráčov na tréningoch</Text>
-              <View
-                style={[
-                  s.badge,
-                  { backgroundColor: theme.colors.tertiaryContainer },
-                ]}
-              >
-                <Text style={[s.badgeText, { color: theme.colors.onTertiaryContainer }]}>
-                  {announcements.length}
-                </Text>
-              </View>
-            </View>
-            <Text style={s.line}>•Táto sekcia zobrazuje dochádzku hráčov na tréningoch.</Text>
-          </View>
-        </TouchableRipple>
-      </Card>
-    </ScrollView>
-  );
+          <Text style={s.line}>
+            Prehľad dochádzky hráčov na tréningoch
+          </Text>
+        </View>
+      </TouchableRipple>
+    </Card>
+  </ScrollView>
+);
 }
