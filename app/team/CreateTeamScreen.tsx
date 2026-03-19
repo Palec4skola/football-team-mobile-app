@@ -32,8 +32,6 @@ export default function CreateTeamScreen() {
   const [level, setLevel] = useState<"amateur" | "professional" | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const [showCountryDropDown, setShowCountryDropDown] = useState(false);
-
   const handleCreateTeam = async () => {
     const name = teamName.trim();
     const c = country.trim();

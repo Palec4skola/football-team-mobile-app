@@ -1,32 +1,47 @@
 import { Picker } from "@react-native-picker/picker";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Image, View } from "react-native";
 import { Button, Card, Divider, Text } from "react-native-paper";
+
 import { auth, db } from "../../firebase";
-import { useCurrentUser } from "../../hooks/useCurrentUser";
 import profileStyles from "@/styles/profile.styles";
+import { userRepo, UserModel } from "@/data/firebase/UserRepo";
 
 export default function Profile() {
   const router = useRouter();
+
+  const [user, setUser] = useState<UserModel | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [teamName, setTeamName] = useState<string | null>(null);
   const [teamList, setTeamList] = useState<{ id: string; name: string }[]>([]);
   const [activeTeamId, setActiveTeamId] = useState<string | null>(null);
 
-  const { user, loading } = useCurrentUser();
-  const teamIds: string[] = user?.teams || (user?.teamId ? [user.teamId] : []);
+  const loadProfileData = useCallback(async () => {
+    try {
+      setLoading(true);
 
-  useEffect(() => {
-    if (!user) return;
+      const uid = auth.currentUser?.uid;
+      if (!uid) {
+        setUser(null);
+        setTeamList([]);
+        setTeamName(null);
+        setActiveTeamId(null);
+        return;
+      }
 
-    setActiveTeamId(teamIds.length > 0 ? teamIds[0] : null);
+      const userData = await userRepo.getUserById(uid);
+      setUser(userData);
 
-    const fetchTeams = async () => {
-      if (teamIds.length > 0) {
-        const teamPromises = teamIds.map(async (id) => {
+      const ids: string[] = userData?.teams || (userData?.teamId ? [userData.teamId] : []);
+
+      setActiveTeamId(ids.length > 0 ? ids[0] : null);
+
+      if (ids.length > 0) {
+        const teamPromises = ids.map(async (id) => {
           const teamRef = doc(db, "teams", id);
           const teamSnap = await getDoc(teamRef);
 
@@ -41,16 +56,24 @@ export default function Profile() {
         const teams = await Promise.all(teamPromises);
         setTeamList(teams);
 
-        const activeTeam = teams.find((t) => t.id === teamIds[0]);
+        const activeTeam = teams.find((t) => t.id === ids[0]);
         setTeamName(activeTeam ? activeTeam.name : null);
       } else {
         setTeamList([]);
         setTeamName(null);
       }
-    };
+    } catch {
+      Alert.alert("Chyba", "Nepodarilo sa načítať profil.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    fetchTeams();
-  }, [user]);
+  useFocusEffect(
+    useCallback(() => {
+      loadProfileData();
+    }, [loadProfileData])
+  );
 
   const initials = useMemo(() => {
     const first = user?.firstName?.[0] ?? "";
@@ -64,7 +87,7 @@ export default function Profile() {
       Alert.alert("Úspech", "Boli ste odhlásený");
       router.replace("/login");
     } catch (error: any) {
-      Alert.alert("Chyba", error.message);
+      Alert.alert("Chyba", error.message || "Nepodarilo sa odhlásiť.");
     }
   };
 
@@ -171,6 +194,16 @@ export default function Profile() {
               onPress={() => router.push("/registration/join-team")}
             >
               Pridať sa do tímu
+            </Button>
+
+            <Button
+              mode="outlined"
+              style={profileStyles.actionButton}
+              contentStyle={profileStyles.actionButtonContent}
+              icon="cog-outline"
+              onPress={() => router.push("/profileSettings")}
+            >
+              Nastavenia
             </Button>
 
             <Button
