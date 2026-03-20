@@ -1,4 +1,3 @@
-// src/utils/dateUtils.ts
 
 /** Vracia lokálny dátum ako "YYYY-MM-DD" (nie UTC). */
 export function localDateKey(d: Date = new Date()): string {

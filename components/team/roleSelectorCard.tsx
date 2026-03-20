@@ -1,4 +1,3 @@
-// src/features/players/components/RoleSelectorCard.tsx
 import React from "react";
 import { StyleSheet } from "react-native";
 import { Card, Button, Text } from "react-native-paper";

@@ -1,7 +1,6 @@
-// src/hooks/match/useEditMatchForm.ts
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
-import { Match, matchRepo } from "@/data/firebase/MatchRepo";
+import { Match, matchRepo, MatchStatus } from "@/data/firebase/MatchRepo";
 
 function norm(s: string) {
   return s.trim().replace(/\s+/g, " ");
@@ -17,6 +16,10 @@ export function useEditMatchForm(teamId: string, matchId: string) {
   const [place, setPlace] = useState("");
   const [date, setDate] = useState(new Date());
 
+  const [status, setStatus] = useState<MatchStatus>("scheduled");
+  const [teamScore, setTeamScore] = useState("");
+  const [opponentScore, setOpponentScore] = useState("");
+
   useEffect(() => {
     let alive = true;
 
@@ -31,7 +34,14 @@ export function useEditMatchForm(teamId: string, matchId: string) {
         if (m) {
           setOpponent(m.opponent ?? "");
           setPlace(m.place ?? "");
-          // m.date je Timestamp
+          setDate(m.date?.toDate ? m.date.toDate() : new Date());
+          setStatus(m.status ?? "scheduled");
+          setTeamScore(
+            m.result?.team !== undefined ? String(m.result.team) : "",
+          );
+          setOpponentScore(
+            m.result?.opponent !== undefined ? String(m.result.opponent) : "",
+          );
           setDate(m.date?.toDate ? m.date.toDate() : new Date());
         }
       } catch (e: any) {
@@ -70,10 +80,19 @@ export function useEditMatchForm(teamId: string, matchId: string) {
 
     setSaving(true);
     try {
+      const result =
+        status === "finished"
+          ? {
+              team: Number(teamScore),
+              opponent: Number(opponentScore),
+            }
+          : null;
       await matchRepo.update(teamId, matchId, {
-        opponent: o,
-        place: p,
+        opponent: opponent.trim(),
+        place: place.trim(),
         date,
+        status,
+        result,
       });
       return true;
     } catch (e: any) {
@@ -97,5 +116,11 @@ export function useEditMatchForm(teamId: string, matchId: string) {
     setDate,
 
     submit,
+    status,
+    setStatus,
+    teamScore,
+    setTeamScore,
+    opponentScore,
+    setOpponentScore,
   };
 }

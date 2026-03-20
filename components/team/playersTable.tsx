@@ -22,6 +22,7 @@ type Props = {
 export function PlayersTable({ members, onPressPlayer, renderRight }: Props) {
   return (
     <FlatList
+    scrollEnabled={false}
       data={members}
       keyExtractor={(item) => item.id}
       showsVerticalScrollIndicator={false}

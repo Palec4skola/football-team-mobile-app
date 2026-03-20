@@ -1,4 +1,3 @@
-// src/hooks/chat/useTeamChat.ts
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
 import { auth } from "@/firebase";

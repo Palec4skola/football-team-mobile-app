@@ -96,7 +96,9 @@ export const trainingRepo = {
     cb: (rows: TrainingModel[]) => void,
   ): Unsubscribe {
     const colRef = collection(db, "teams", teamId, "trainings");
-    const q = query(colRef, orderBy("startsAt", "asc"));
+     const today = new Date();
+  today.setHours(0, 0, 0, 0);
+    const q = query(colRef,where("startsAt",">=",Timestamp.fromDate(today)), orderBy("startsAt", "asc"));
 
     return onSnapshot(q, (snap) => {
       cb(snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })));

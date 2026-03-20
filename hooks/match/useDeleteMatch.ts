@@ -1,4 +1,3 @@
-// src/features/matches/hooks/useDeleteMatch.ts
 import { useState } from "react";
 import { Alert } from "react-native";
 import { matchRepo } from "@/data/firebase/MatchRepo";
@@ -17,7 +16,7 @@ export function useDeleteMatch(teamId: string | null) {
         onPress: async () => {
           setLoading(true);
           try {
-            await matchRepo.remove(teamId, matchId);
+            await matchRepo.delete(teamId, matchId);
             onSuccess?.();
           } catch (e: any) {
             Alert.alert("Chyba", e?.message ?? "Nepodarilo sa vymazať zápas");

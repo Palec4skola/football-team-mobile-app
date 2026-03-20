@@ -1,4 +1,3 @@
-// src/app/match/match-list.tsx
 import React from "react";
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
 import { Button, Card, Text } from "react-native-paper";

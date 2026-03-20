@@ -1,22 +1,27 @@
 import { PlayersTable } from "@/components/team/playersTable";
 import { useRouter } from "expo-router";
 import React from "react";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, View, ScrollView } from "react-native";
 import { Button, Card, Text } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTeamManagementAccess } from "../../hooks/useTeamManagementAccess";
 import { useTeamMembers } from "../../hooks/useTeamMembers";
-import { styles } from "../../styles/team.styles";
+import { useTeamStats } from "@/hooks/useTeamStats";
+import { useActiveTeam } from "@/hooks/useActiveTeam";
+import { TeamStatsCard } from "@/components/team/teamStatsCard";
+import { styles } from "@/styles/team.styles";
 
 export default function TeamManagement() {
   const router = useRouter();
   const { isLoading, isCoach, teamId, errorText } = useTeamManagementAccess();
-
+  const { members, loading, error } = useTeamMembers(teamId);
+  const { teamLevel } = useActiveTeam();
+  const isProfessional = teamLevel === "professional";
   const {
-    members,
-    loading,
-    error,
-  } = useTeamMembers(teamId);
+    stats,
+    loading: statsLoading,
+    error: statsError,
+  } = useTeamStats(teamId);
 
   const handleAddPlayer = () => {
     router.push({
@@ -72,19 +77,24 @@ export default function TeamManagement() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={localStyles.header}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
+      {" "}
+      <View style={styles.header}>
         <Text style={styles.title}>Správa tímu</Text>
-        <Text style={localStyles.subtitle}>
+        <Text style={styles.subtitle}>
           Prehľad členov tímu a ich správa na jednom mieste.
         </Text>
       </View>
-
       {isCoach && (
-        <Card style={localStyles.infoCard} mode="elevated">
-          <View style={localStyles.infoCardContent}>
-            <View style={localStyles.infoLeft}>
-              <View style={localStyles.iconWrap}>
+        <Card style={styles.infoCard} mode="elevated">
+          <View style={styles.infoCardContent}>
+            <View style={styles.infoLeft}>
+              <View style={styles.iconWrap}>
                 <MaterialCommunityIcons
                   name="account-plus-outline"
                   size={22}
@@ -93,8 +103,8 @@ export default function TeamManagement() {
               </View>
 
               <View style={{ flex: 1 }}>
-                <Text style={localStyles.infoTitle}>Pozvi nového hráča</Text>
-                <Text style={localStyles.infoText}>
+                <Text style={styles.infoTitle}>Pozvi nového hráča</Text>
+                <Text style={styles.infoText}>
                   Vygeneruj kód a pridaj ďalších členov do tímu.
                 </Text>
               </View>
@@ -103,7 +113,7 @@ export default function TeamManagement() {
             <Button
               mode="contained"
               onPress={handleAddPlayer}
-              style={localStyles.addButton}
+              style={styles.addButton}
               contentStyle={{ paddingVertical: 4 }}
               icon="plus"
             >
@@ -112,81 +122,45 @@ export default function TeamManagement() {
           </View>
         </Card>
       )}
+      {isProfessional && (
+        <View style={styles.statsSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Štatistika tímu</Text>
+            <Text style={styles.sectionSubtitle}>
+              Automaticky vypočítaná z odohraných zápasov.
+            </Text>
+          </View>
 
-      <View style={localStyles.listHeader}>
-        <Text style={localStyles.listTitle}>Členovia tímu</Text>
-        <Text style={localStyles.memberCount}>{members.length}</Text>
+          {statsLoading ? (
+            <Card style={styles.statsCard} mode="elevated">
+              <View style={styles.statsLoadingWrap}>
+                <ActivityIndicator size="small" />
+                <Text style={styles.statsLoadingText}>
+                  Načítavam štatistiky tímu...
+                </Text>
+              </View>
+            </Card>
+          ) : statsError ? (
+            <Card style={styles.statsCard} mode="elevated">
+              <View style={styles.statsErrorWrap}>
+                <Text style={styles.statsErrorText}>{statsError}</Text>
+              </View>
+            </Card>
+          ) : (
+            <View style={styles.statsCardWrap}>
+              <TeamStatsCard stats={stats} />
+            </View>
+          )}
+        </View>
+      )}
+      <View style={styles.listSection}>
+        <View style={styles.listHeader}>
+          <Text style={styles.listTitle}>Členovia tímu</Text>
+          <Text style={styles.memberCount}>{members.length}</Text>
+        </View>
+
+        <PlayersTable members={members} onPressPlayer={handlePressPlayer} />
       </View>
-
-      <PlayersTable members={members} onPressPlayer={handlePressPlayer} />
-    </View>
+    </ScrollView>
   );
 }
-
-const localStyles = {
-  header: {
-    marginBottom: 16,
-  },
-  subtitle: {
-    marginTop: 4,
-    fontSize: 14,
-    color: "#6B7280",
-  },
-  infoCard: {
-    marginBottom: 16,
-    borderRadius: 20,
-    backgroundColor: "#FFFFFF",
-  },
-  infoCardContent: {
-    padding: 16,
-    gap: 14,
-  },
-  infoLeft: {
-    flexDirection: "row" as const,
-    alignItems: "center" as const,
-    gap: 12,
-  },
-  iconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: "#DBEAFE",
-    alignItems: "center" as const,
-    justifyContent: "center" as const,
-  },
-  infoTitle: {
-    fontSize: 16,
-    fontWeight: "700" as const,
-    color: "#111827",
-    marginBottom: 2,
-  },
-  infoText: {
-    fontSize: 13,
-    color: "#6B7280",
-  },
-  addButton: {
-    borderRadius: 14,
-    alignSelf: "flex-start" as const,
-  },
-  listHeader: {
-    flexDirection: "row" as const,
-    alignItems: "center" as const,
-    justifyContent: "space-between" as const,
-    marginBottom: 12,
-  },
-  listTitle: {
-    fontSize: 18,
-    fontWeight: "700" as const,
-    color: "#111827",
-  },
-  memberCount: {
-    minWidth: 30,
-    textAlign: "center" as const,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 999,
-    backgroundColor: "#E5E7EB",
-    color: "#374151",
-    fontWeight: "700" as const,
-  },
-};

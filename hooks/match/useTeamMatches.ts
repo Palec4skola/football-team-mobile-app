@@ -1,4 +1,3 @@
-// src/hooks/match/useTeamMatches.ts
 import { useEffect, useState } from "react";
 import { Match, matchRepo, } from "@/data/firebase/MatchRepo";
 

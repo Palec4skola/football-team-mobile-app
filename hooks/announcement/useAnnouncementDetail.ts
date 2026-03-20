@@ -1,4 +1,3 @@
-// src/features/announcements/hooks/useAnnouncementDetail.ts
 import { useEffect, useState } from "react";
 import {
   announcementRepo,

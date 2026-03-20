@@ -1,7 +1,7 @@
 // src/app/match/edit-match.tsx
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
-import { View } from "react-native";
+import { ScrollView, View, KeyboardAvoidingView,Platform } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
 
 import { MatchForm } from "@/components/match/MatchForm";
@@ -24,9 +24,15 @@ export default function EditMatchScreen() {
     setPlace,
     date,
     setDate,
+    status,
+    setStatus,
+    teamScore,
+    setTeamScore,
+    opponentScore,
+    setOpponentScore,
     submit,
   } = useEditMatchForm(teamId, matchId);
-  console.log("match", match);
+
   if (loadingMatch) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -53,8 +59,28 @@ export default function EditMatchScreen() {
     });
   };
 
+  const canSubmit =
+    !saving &&
+    opponent.trim().length > 0 &&
+    place.trim().length > 0 &&
+    (status !== "finished" ||
+      (teamScore.trim() !== "" &&
+        opponentScore.trim() !== "" &&
+        !Number.isNaN(Number(teamScore)) &&
+        !Number.isNaN(Number(opponentScore))));
+
   return (
-    <View style={{ flex: 1 }}>
+    <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={20}
+        >
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
       <MatchForm
         opponent={opponent}
         setOpponent={setOpponent}
@@ -62,12 +88,17 @@ export default function EditMatchScreen() {
         setPlace={setPlace}
         date={date}
         setDate={setDate}
+        status={status}
+        setStatus={setStatus}
+        teamScore={teamScore}
+        setTeamScore={setTeamScore}
+        opponentScore={opponentScore}
+        setOpponentScore={setOpponentScore}
         loading={saving}
-        canSubmit={
-          !saving && opponent.trim().length > 0 && place.trim().length > 0
-        }
+        canSubmit={canSubmit}
         onSubmit={onSubmit}
       />
-    </View>
+    </ScrollView>
+        </KeyboardAvoidingView>
   );
 }

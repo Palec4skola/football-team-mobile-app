@@ -1,4 +1,3 @@
-// src/features/matches/hooks/useUpdateMatch.ts
 import { useState } from "react";
 import { Alert } from "react-native";
 import { matchRepo, MatchUpdateInput } from "@/data/firebase/MatchRepo";
