@@ -27,7 +27,6 @@ export default function TeamCalendarScreen() {
   const router = useRouter();
   const { teamId } = useActiveTeam();
   
-  console.log(teamId);
   const { loading, eventsByDay, loadRange } = useCalendarEventsRange(teamId);
   
   const [selectedDay, setSelectedDay] = useState<string>(todayKey());

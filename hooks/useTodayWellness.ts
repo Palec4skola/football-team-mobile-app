@@ -80,7 +80,6 @@ export function useTodayWellness(
     input: WellnessSaveInput,
   ): Promise<{ ok: boolean; error?: string }> {
     try {
-      console.log(teamId, userId);
       setLoading(true);
       setError(null);
       if (!teamId) {
@@ -95,7 +94,6 @@ export function useTodayWellness(
         ? `${e.code}: ${e?.message ?? "Firestore error"}`
         : (e?.message ?? "Nepodarilo sa uložiť wellness.");
 
-      console.log("[wellness.save] error", e); // dôležité: pozrieš v console
       setError(msg);
       return { ok: false, error: msg };
     } finally {

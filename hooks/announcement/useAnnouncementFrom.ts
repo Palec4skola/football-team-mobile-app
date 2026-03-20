@@ -91,7 +91,7 @@ export function useAnnouncementForm(params: {
       setSaving(true);
 
       if (mode === "create") {
-        const newId = await announcementRepo.create(teamId, {
+        await announcementRepo.create(teamId, {
           title,
           content,
           createdBy: user.uid,

@@ -3,7 +3,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import React, { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, Alert, Image, View } from "react-native";
+import { ActivityIndicator, Alert, Image, View, ScrollView } from "react-native";
 import { Button, Card, Divider, Text } from "react-native-paper";
 
 import { auth, db } from "../../firebase";
@@ -93,6 +93,10 @@ export default function Profile() {
 
   return (
     <View style={profileStyles.screenBg}>
+      <ScrollView
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+              >
       <View style={profileStyles.container}>
         <Text style={profileStyles.pageTitle}>Môj profil</Text>
         <Text style={profileStyles.pageSubtitle}>
@@ -218,7 +222,7 @@ export default function Profile() {
             </Button>
           </View>
         </Card>
-      </View>
+      </View></ScrollView>
     </View>
   );
 }

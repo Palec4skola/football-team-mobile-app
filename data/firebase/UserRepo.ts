@@ -65,7 +65,6 @@ export const userRepo = {
   },
   async addMembership(userId: string, teamId: string, teamName: string, roles: string[]) {
     const userMembershipRef = doc(db, "users", userId, "memberships", teamId);
-    console.log("Adding membership for user", userId, "team", teamId, "roles", roles);
       await setDoc(
         userMembershipRef,
         {

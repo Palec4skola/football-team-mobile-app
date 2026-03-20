@@ -32,7 +32,6 @@ export default function TabsLayout() {
         return;
       }
 
-      // ✅ zavri menu hneď, nečakaj na await
       closeMenu();
 
       // ak klikol na ten istý tím, nerob nič
@@ -44,7 +43,7 @@ export default function TabsLayout() {
     [uid, activeTeamId, closeMenu],
   );
 
-  const handleOpenChat = () => router.push("../chat/chat-list");
+  const handleOpenChat = () => router.push("../chat/chat");
 
   const canGoBack = router.canGoBack();
 

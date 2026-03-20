@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Modal, View } from "react-native";
+import { Modal, View,KeyboardAvoidingView,Platform } from "react-native";
 import { Card, Text, TextInput, Button, IconButton } from "react-native-paper";
 import { styles } from "@/styles/editStatModal.styles";
 
@@ -30,6 +30,10 @@ export function EditStatModal({
       animationType="fade"
       onRequestClose={onCancel}
     >
+      <KeyboardAvoidingView
+        style={styles.backdrop}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
       <View style={styles.backdrop}>
         <Card style={styles.sheet} mode="elevated">
           <View style={styles.sheetHeader}>
@@ -63,6 +67,7 @@ export function EditStatModal({
           </View>
         </Card>
       </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

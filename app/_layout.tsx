@@ -40,10 +40,11 @@ export default function RootLayout() {
         <Stack.Screen name="login" options={{ headerShown: false, title: "Prihlásenie" }} />
         <Stack.Screen name="register" options={{ headerShown: true, title: "Registrácia" }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="chat-list" options={{ headerShown: true, title: "Chaty" }} />
+        <Stack.Screen name="chat" options={{ headerShown: true, title: "Chaty" }} />
       </Stack>
 
       <StatusBar style="auto" />
+      
     </PaperProvider>
   );
 }

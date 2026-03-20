@@ -76,7 +76,7 @@ export default function WellnessFormScreen() {
   const ok = await save(payload);
   if (!ok) return;
 
-  router.push("/team/wellness");
+  router.push({pathname:"/team/wellness",params:{teamId}});
 };
 
   return (
