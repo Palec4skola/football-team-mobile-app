@@ -19,7 +19,7 @@ export default function ChooseTeamAction() {
 
       <Button
         style={styles.button}
-        onPress={() => router.push('../create-join-team/create-team')}
+        onPress={() => router.push('/team/CreateTeamScreen')}
       >
         <Text style={styles.buttonText}>Vytvoriť nový tím</Text>
       </Button>
