@@ -1,4 +1,14 @@
-import { doc, getDoc, updateDoc, setDoc, deleteDoc, serverTimestamp, Timestamp, Unsubscribe, onSnapshot } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  setDoc,
+  deleteDoc,
+  serverTimestamp,
+  Timestamp,
+  Unsubscribe,
+  onSnapshot,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 
 export type UserModel = {
@@ -7,6 +17,7 @@ export type UserModel = {
   email?: string;
   roles?: string[] | string;
   activeTeamId?: string | null;
+  photoURL?: string | null;
   teamId?: string | null;
   height?: number | string;
   weight?: number | string;
@@ -21,12 +32,7 @@ export type TeamMemberModel = {
   [key: string]: any;
 };
 
-export type UserStatKey =
-  | "height"
-  | "weight"
-  | "bmi"
-  | "vo2max"
-  | "topSpeed";
+export type UserStatKey = "height" | "weight" | "bmi" | "vo2max" | "topSpeed";
 
 function normalizeRoles(roles: unknown): string[] {
   if (Array.isArray(roles)) return roles;
@@ -35,7 +41,6 @@ function normalizeRoles(roles: unknown): string[] {
 }
 
 export const userRepo = {
-
   async getUserById(userId: string): Promise<UserModel | null> {
     const snap = await getDoc(doc(db, "users", userId));
     if (!snap.exists()) return null;
@@ -46,40 +51,45 @@ export const userRepo = {
     const user = await this.getUserById(userId);
     return user?.activeTeamId ?? null;
   },
-    // });
-    //TODO: treba updatovat aj v membership dokumente
+  // });
+  //TODO: treba updatovat aj v membership dokumente
   async updateRoles(teamId: string, userId: string, roles: string[]) {
     const ref = doc(db, "teams", teamId, "members", userId);
     await updateDoc(ref, { roles });
   },
 
- async setActiveTeamId(userId: string, teamId: string | null) {
-  await updateDoc(doc(db, "users", userId), { activeTeamId: teamId });
-},
+  async setActiveTeamId(userId: string, teamId: string | null) {
+    await updateDoc(doc(db, "users", userId), { activeTeamId: teamId });
+  },
 
   async updateStat(userId: string, statKey: UserStatKey, value: string) {
-    const userRef = doc(db,"users",userId);
+    const userRef = doc(db, "users", userId);
     await updateDoc(userRef, {
-    [`stats.${statKey}`]: value,
-  });
+      [`stats.${statKey}`]: value,
+    });
   },
-  async addMembership(userId: string, teamId: string, teamName: string, roles: string[]) {
+  async addMembership(
+    userId: string,
+    teamId: string,
+    teamName: string,
+    roles: string[],
+  ) {
     const userMembershipRef = doc(db, "users", userId, "memberships", teamId);
-      await setDoc(
-        userMembershipRef,
-        {
-          roles: roles,
-          teamId,
-          teamName,
-          joinedAt: serverTimestamp(),
-        },
-        { merge: true },
-      );
+    await setDoc(
+      userMembershipRef,
+      {
+        roles: roles,
+        teamId,
+        teamName,
+        joinedAt: serverTimestamp(),
+      },
+      { merge: true },
+    );
   },
-  async removeMembership(userId: string, teamId: string|null) {
+  async removeMembership(userId: string, teamId: string | null) {
     if (!teamId) return;
     const membershipRef = doc(db, "users", userId, "memberships", teamId);
-  await deleteDoc(membershipRef);
+    await deleteDoc(membershipRef);
   },
 
   subscribeLastAlertsReadAt(
@@ -87,7 +97,7 @@ export const userRepo = {
     opts: {
       onData: (ts: Timestamp | null) => void;
       onError?: (e: unknown) => void;
-    }
+    },
   ): Unsubscribe {
     const ref = doc(db, "users", userId);
 
@@ -98,7 +108,7 @@ export const userRepo = {
         const ts = data?.lastAlertsReadAt;
         opts.onData(ts instanceof Timestamp ? ts : null);
       },
-      (err) => opts.onError?.(err)
+      (err) => opts.onError?.(err),
     );
   },
 
@@ -108,7 +118,7 @@ export const userRepo = {
       {
         lastAlertsReadAt: Timestamp.now(),
       },
-      { merge: true }
+      { merge: true },
     );
   },
 
