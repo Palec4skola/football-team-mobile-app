@@ -2,7 +2,7 @@ import React from "react";
 import { FlatList, View } from "react-native";
 import { Text } from "react-native-paper";
 import { TeamPlayerRow } from "./teamPlayerRow";
-import { auth } from "../../firebase";
+import { auth } from "@/firebase";
 
 type TeamMember = {
   id: string;

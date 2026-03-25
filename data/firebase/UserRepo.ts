@@ -7,6 +7,8 @@ import {
   serverTimestamp,
   Timestamp,
   Unsubscribe,
+  collection,
+  getDocs,
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -121,6 +123,18 @@ export const userRepo = {
       { merge: true },
     );
   },
+  
 
   normalizeRoles,
 };
+export async function getUserMembershipTeamIds(uid: string): Promise<string[]> {
+  const membershipsRef = collection(db, "users", uid, "memberships");
+  const snapshot = await getDocs(membershipsRef);
+  console.log(membershipsRef);
+  return snapshot.docs
+    .map((doc) => {
+      const data = doc.data();
+      return typeof data.teamId === "string" ? data.teamId : null;
+    })
+    .filter((teamId): teamId is string => !!teamId);
+}

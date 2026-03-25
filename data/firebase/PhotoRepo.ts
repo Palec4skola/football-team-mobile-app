@@ -1,7 +1,8 @@
-import * as FileSystem from "expo-file-system";
+// import * as FileSystem from "expo-file-system";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db, storage } from "@/firebase";
+import { getUserMembershipTeamIds } from "@/data/firebase/UserRepo";
 
 export async function uploadUserProfilePhoto(uid: string, uri: string) {
   const response = await fetch(uri);
@@ -19,7 +20,7 @@ export async function uploadUserProfilePhoto(uid: string, uri: string) {
     photoURL: downloadURL,
     updatedAt: serverTimestamp(),
   });
-
+  await syncPhotoToTeamMembers(uid, downloadURL);
   return downloadURL;
 }
 
@@ -28,4 +29,17 @@ export async function removeUserProfilePhoto(uid: string) {
     photoURL: null,
     updatedAt: serverTimestamp(),
   });
+  await syncPhotoToTeamMembers(uid, null);
+}
+async function syncPhotoToTeamMembers(uid: string, photoURL: string | null) {
+  const teamIds = await getUserMembershipTeamIds(uid);
+
+  await Promise.all(
+    teamIds.map((teamId) =>
+      updateDoc(doc(db, "teams", teamId, "members", uid), {
+        photoURL,
+        updatedAt: serverTimestamp(),
+      }),
+    ),
+  );
 }

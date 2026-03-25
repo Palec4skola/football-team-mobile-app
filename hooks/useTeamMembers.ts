@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { db } from '../firebase';
 
 type TeamMember = {
-  id: string; // userId (docId)
+  id: string;
   firstName?: string;
   lastName?: string;
   photoURL?: string;
