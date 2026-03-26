@@ -31,4 +31,26 @@ export const styles = StyleSheet.create({
 
   mt12: { marginTop: 12 },
   mt16: { marginTop: 16 },
+  avatar: {
+  width: 52,
+  height: 52,
+  borderRadius: 26,
+  marginRight: 12,
+},
+
+avatarFallback: {
+  width: 52,
+  height: 52,
+  borderRadius: 26,
+  backgroundColor: "#E5E7EB",
+  justifyContent: "center",
+  alignItems: "center",
+  marginRight: 12,
+},
+
+avatarFallbackText: {
+  fontSize: 18,
+  fontWeight: "600",
+  color: "#374151",
+},
 });

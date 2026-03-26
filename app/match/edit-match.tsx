@@ -1,7 +1,7 @@
 // src/app/match/edit-match.tsx
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
-import { ScrollView, View, KeyboardAvoidingView,Platform } from "react-native";
+import { ScrollView, View, KeyboardAvoidingView, Platform } from "react-native";
 import { ActivityIndicator, Text } from "react-native-paper";
 
 import { MatchForm } from "@/components/match/MatchForm";
@@ -26,13 +26,14 @@ export default function EditMatchScreen() {
     setDate,
     status,
     setStatus,
+    matchLink,
+    setMatchLink,
     teamScore,
     setTeamScore,
     opponentScore,
     setOpponentScore,
     submit,
   } = useEditMatchForm(teamId, matchId);
-
   if (loadingMatch) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -71,34 +72,36 @@ export default function EditMatchScreen() {
 
   return (
     <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={20}
-        >
-          <ScrollView
-            style={{ flex: 1 }}
-            contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-      <MatchForm
-        opponent={opponent}
-        setOpponent={setOpponent}
-        place={place}
-        setPlace={setPlace}
-        date={date}
-        setDate={setDate}
-        status={status}
-        setStatus={setStatus}
-        teamScore={teamScore}
-        setTeamScore={setTeamScore}
-        opponentScore={opponentScore}
-        setOpponentScore={setOpponentScore}
-        loading={saving}
-        canSubmit={canSubmit}
-        onSubmit={onSubmit}
-      />
-    </ScrollView>
-        </KeyboardAvoidingView>
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={20}
+    >
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 32 }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <MatchForm
+          opponent={opponent}
+          setOpponent={setOpponent}
+          place={place}
+          setPlace={setPlace}
+          date={date}
+          setDate={setDate}
+          status={status}
+          setStatus={setStatus}
+          matchLink={matchLink}
+          setMatchLink={setMatchLink}
+          teamScore={teamScore}
+          setTeamScore={setTeamScore}
+          opponentScore={opponentScore}
+          setOpponentScore={setOpponentScore}
+          loading={saving}
+          canSubmit={canSubmit}
+          onSubmit={onSubmit}
+        />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

@@ -32,6 +32,7 @@ export type MatchDoc = {
   date: Timestamp;
   result: MatchResult;
   status: MatchStatus;
+  matchLink?: string | null;
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
 };
@@ -46,6 +47,7 @@ export type MatchCreateDoc = {
   date: Date;
   result: MatchResult;
   status: MatchStatus;
+  matchLink?: string | null;
   createdAt: FieldValue;
   updatedAt: FieldValue;
 };
@@ -55,6 +57,7 @@ export type MatchCreateInput = {
   place: string;
   date: Date;
   result?: MatchResult;
+  matchLink?: string | null;
   status?: MatchStatus;
 };
 
@@ -63,6 +66,7 @@ export type MatchUpdateInput = Partial<{
   place: string;
   date: Date;
   result: MatchResult;
+  matchLink: string | null;
   status: MatchStatus;
 }>;
 
@@ -89,6 +93,21 @@ function mapMatchDoc(d: QueryDocumentSnapshot<DocumentData>): Match {
     id: d.id,
     ...(d.data() as MatchDoc),
   };
+}
+
+function prepareMatchLink(url?: string | null): string | null {
+  const value = url?.trim();
+  if (!value) return null;
+
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return null;
+    }
+    return value;
+  } catch {
+    return null;
+  }
 }
 
 function calculateStats(matches: Match[]): TeamStats {
@@ -136,6 +155,7 @@ export const matchRepo = {
       date: input.date,
       result: input.result ?? null,
       status: input.status ?? "scheduled",
+      matchLink: prepareMatchLink(input.matchLink),
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
@@ -147,7 +167,6 @@ export const matchRepo = {
   async getById(teamId: string, matchId: string): Promise<Match | null> {
     const ref = matchDocRef(teamId, matchId);
     const snap = await getDoc(ref);
-
     if (!snap.exists()) return null;
 
     return {
@@ -162,8 +181,12 @@ export const matchRepo = {
     onError?: (e: Error) => void,
   ): Unsubscribe {
     const today = new Date();
-  today.setHours(0, 0, 0, 0);
-    const q = query(matchesCol(teamId), where("date",">=",Timestamp.fromDate(today)),orderBy("date", "desc"));
+    today.setHours(0, 0, 0, 0);
+    const q = query(
+      matchesCol(teamId),
+      where("date", ">=", Timestamp.fromDate(today)),
+      orderBy("date", "desc"),
+    );
 
     return onSnapshot(
       q,
@@ -185,29 +208,20 @@ export const matchRepo = {
     const updatePayload: Record<string, unknown> = {
       updatedAt: serverTimestamp(),
     };
-
     if (patch.opponent !== undefined) updatePayload.opponent = patch.opponent;
     if (patch.place !== undefined) updatePayload.place = patch.place;
     if (patch.date !== undefined) updatePayload.date = patch.date;
     if (patch.result !== undefined) updatePayload.result = patch.result;
     if (patch.status !== undefined) updatePayload.status = patch.status;
-
+    if (patch.matchLink !== undefined) {
+      updatePayload.matchLink = prepareMatchLink(patch.matchLink);
+    }
     await updateDoc(ref, updatePayload);
   },
 
   async delete(teamId: string, matchId: string): Promise<void> {
     const ref = matchDocRef(teamId, matchId);
     await deleteDoc(ref);
-  },
-
-  // -------------------------
-  // EXTRA FUNKCIE
-  // -------------------------
-
-  async list(teamId: string): Promise<Match[]> {
-    const q = query(matchesCol(teamId), orderBy("date", "desc"));
-    const snap = await getDocs(q);
-    return snap.docs.map(mapMatchDoc);
   },
 
   async listFinished(teamId: string): Promise<Match[]> {
@@ -219,20 +233,6 @@ export const matchRepo = {
 
     const snap = await getDocs(q);
     return snap.docs.map(mapMatchDoc);
-  },
-
-  async setResult(
-    teamId: string,
-    matchId: string,
-    result: { team: number; opponent: number },
-  ): Promise<void> {
-    const ref = matchDocRef(teamId, matchId);
-
-    await updateDoc(ref, {
-      result,
-      status: "finished",
-      updatedAt: serverTimestamp(),
-    });
   },
 
   async clearResult(teamId: string, matchId: string): Promise<void> {
@@ -268,11 +268,7 @@ export const matchRepo = {
     cb: (stats: TeamStats) => void,
     onError?: (e: Error) => void,
   ): Unsubscribe {
-    const q = query(
-      matchesCol(teamId),
-      where("status", "==", "finished"),
-    );
-    
+    const q = query(matchesCol(teamId), where("status", "==", "finished"));
 
     return onSnapshot(
       q,

@@ -19,6 +19,7 @@ export function useEditMatchForm(teamId: string, matchId: string) {
   const [status, setStatus] = useState<MatchStatus>("scheduled");
   const [teamScore, setTeamScore] = useState("");
   const [opponentScore, setOpponentScore] = useState("");
+  const [matchLink, setMatchLink] = useState("");
 
   useEffect(() => {
     let alive = true;
@@ -42,7 +43,7 @@ export function useEditMatchForm(teamId: string, matchId: string) {
           setOpponentScore(
             m.result?.opponent !== undefined ? String(m.result.opponent) : "",
           );
-          setDate(m.date?.toDate ? m.date.toDate() : new Date());
+          setMatchLink(m.matchLink ?? "");
         }
       } catch (e: any) {
         if (!alive) return;
@@ -92,6 +93,7 @@ export function useEditMatchForm(teamId: string, matchId: string) {
         place: place.trim(),
         date,
         status,
+        matchLink,
         result,
       });
       return true;
@@ -118,6 +120,8 @@ export function useEditMatchForm(teamId: string, matchId: string) {
     submit,
     status,
     setStatus,
+    matchLink,
+    setMatchLink,
     teamScore,
     setTeamScore,
     opponentScore,

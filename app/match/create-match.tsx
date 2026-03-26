@@ -49,6 +49,8 @@ export default function CreateMatchScreen() {
             date={vm.date}
             setDate={vm.setDate}
             status={vm.status}
+            matchLink={vm.matchLink}
+            setMatchLink={vm.setMatchLink}
             setStatus={vm.setStatus}
             teamScore={vm.teamScore}
             setTeamScore={vm.setTeamScore}

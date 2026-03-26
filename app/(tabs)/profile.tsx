@@ -22,12 +22,11 @@ export default function Profile() {
 
   const [user, setUser] = useState<UserModel | null>(null);
   const [loading, setLoading] = useState(true);
-
   const [teamName, setTeamName] = useState<string | null>(null);
   const [teamList, setTeamList] = useState<{ id: string; name: string }[]>([]);
   const [activeTeamId, setActiveTeamId] = useState<string | null>(null);
   const { uploading, pickAndUploadPhoto, deletePhoto } = useProfilePhoto(
-    user?.uid ?? "",
+    auth.currentUser?.uid ?? "",
   );
 
   const loadProfileData = useCallback(async () => {

@@ -35,6 +35,8 @@ type Props = {
   setDate: (d: Date) => void;
   status: MatchStatus;
   setStatus: (v: MatchStatus) => void;
+  matchLink: string;
+  setMatchLink: (v: string) => void;
   teamScore: string;
   setTeamScore: (v: string) => void;
   opponentScore: string;
@@ -53,6 +55,8 @@ export function MatchForm({
   setDate,
   status,
   setStatus,
+  matchLink,
+  setMatchLink,
   teamScore,
   setTeamScore,
   opponentScore,
@@ -69,7 +73,11 @@ export function MatchForm({
     if (!selected) return;
 
     const next = new Date(date);
-    next.setFullYear(selected.getFullYear(), selected.getMonth(), selected.getDate());
+    next.setFullYear(
+      selected.getFullYear(),
+      selected.getMonth(),
+      selected.getDate(),
+    );
     setDate(next);
   };
 
@@ -155,7 +163,19 @@ export function MatchForm({
               autoCapitalize="sentences"
             />
           </View>
-
+          <View style={styles.fieldWrapper}>
+            <Text style={styles.label}>Odkaz na zápas</Text>
+            <TextInput
+              mode="outlined"
+              value={matchLink}
+              onChangeText={setMatchLink}
+              placeholder="https://sportnet.sme.sk/..."
+              style={styles.input}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="url"
+            />
+          </View>
           <View style={styles.fieldWrapper}>
             <Text style={styles.label}>Status zápasu</Text>
             <SegmentedButtons

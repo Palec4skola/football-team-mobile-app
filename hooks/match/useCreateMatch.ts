@@ -21,6 +21,8 @@ export function useCreateMatch(teamId: string | null) {
   const [loading, setLoading] = useState(false);
   const [errorText, setErrorText] = useState<string | null>(null);
 
+  const [matchLink, setMatchLink] = useState("");
+
   const hasValidResult = useMemo(() => {
     if (status !== "finished") return true;
 
@@ -88,6 +90,7 @@ export function useCreateMatch(teamId: string | null) {
         place: p,
         date,
         status,
+        matchLink,
         result: buildResult(),
       });
 
@@ -105,6 +108,7 @@ export function useCreateMatch(teamId: string | null) {
       setPlace("");
       setDate(new Date());
       setStatus("scheduled");
+      setMatchLink("");
       setTeamScore("");
       setOpponentScore("");
 
@@ -131,6 +135,8 @@ export function useCreateMatch(teamId: string | null) {
     setDate,
     status,
     setStatus,
+    matchLink,
+    setMatchLink,
     teamScore,
     setTeamScore,
     opponentScore,

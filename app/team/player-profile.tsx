@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
-import { ScrollView, View, ActivityIndicator } from "react-native";
-import { Card, Text, Button, Avatar, Chip, Divider } from "react-native-paper";
+import { ScrollView, View, ActivityIndicator, Image } from "react-native";
+import { Card, Text, Button, Chip, Divider } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
 
@@ -44,7 +44,6 @@ export default function PlayerProfileScreen() {
 
     removeFromTeam,
   } = usePlayerProfile(teamId, playerId);
-
   const initials = useMemo(() => {
     const a = (player?.firstName ?? "").trim();
     const b = (player?.lastName ?? "").trim();
@@ -83,16 +82,23 @@ export default function PlayerProfileScreen() {
       {/* Profile card */}
       <Card style={styles.profileCard} mode="elevated">
         <View style={styles.profileTopRow}>
-          <Avatar.Text size={52} label={initials} />
-          <View style={styles.profileTextCol}>
-            <Text variant="titleLarge" style={styles.nameLine}>
-              {(player.firstName || "---") + " " + (player.lastName || "")}
-            </Text>
-            <Text variant="bodyMedium" style={styles.muted}>
-              {player.email || "—"}
-            </Text>
-          </View>
-        </View>
+  {player.photoURL ? (
+    <Image source={{ uri: player.photoURL }} style={styles.avatar} />
+  ) : (
+    <View style={styles.avatarFallback}>
+      <Text style={styles.avatarFallbackText}>{initials}</Text>
+    </View>
+  )}
+
+  <View style={styles.profileTextCol}>
+    <Text variant="titleLarge" style={styles.nameLine}>
+      {(player.firstName || "---") + " " + (player.lastName || "")}
+    </Text>
+    <Text variant="bodyMedium" style={styles.muted}>
+      {player.email || "—"}
+    </Text>
+  </View>
+</View>
 
         <Divider style={styles.divider} />
 
