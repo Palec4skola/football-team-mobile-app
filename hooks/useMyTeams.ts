@@ -5,7 +5,6 @@ import { db } from "@/firebase";
 export type MyTeam = {
   teamId: string;        // teamId (docId v memberships)
   teamName: string;      // z memberships
-  roles: string[];       // z memberships (napr. ["coach"])
   joinedAt?: any;        // Timestamp (voliteľné)
 };
 
@@ -32,13 +31,9 @@ export function useMyTeams(userId: string | null) {
       const items: MyTeam[] = snap.docs.map((d) => {
         const data = d.data() as any;
 
-        const roles: string[] =
-          Array.isArray(data.roles) ? data.roles : data.role ? [data.role] : [];
-
         return {
           teamId: data.teamId ?? d.id,
           teamName: data.teamName ?? "Tím",
-          roles,
           joinedAt: data.joinedAt,
         };
       });

@@ -74,13 +74,11 @@ export const userRepo = {
     userId: string,
     teamId: string,
     teamName: string,
-    roles: string[],
   ) {
     const userMembershipRef = doc(db, "users", userId, "memberships", teamId);
     await setDoc(
       userMembershipRef,
       {
-        roles: roles,
         teamId,
         teamName,
         joinedAt: serverTimestamp(),
@@ -88,6 +86,7 @@ export const userRepo = {
       { merge: true },
     );
   },
+  
   async removeMembership(userId: string, teamId: string | null) {
     if (!teamId) return;
     const membershipRef = doc(db, "users", userId, "memberships", teamId);
@@ -130,7 +129,6 @@ export const userRepo = {
 export async function getUserMembershipTeamIds(uid: string): Promise<string[]> {
   const membershipsRef = collection(db, "users", uid, "memberships");
   const snapshot = await getDocs(membershipsRef);
-  console.log(membershipsRef);
   return snapshot.docs
     .map((doc) => {
       const data = doc.data();

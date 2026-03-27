@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { matchRepo } from "@/data/firebase/MatchRepo";
+import { matchRepo, Match } from "@/data/firebase/MatchRepo";
 
 export function useMatch(teamId: string, matchId: string) {
-  const [match, setMatch] = useState<any | null>(null);
+  const [match, setMatch] = useState<Match | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

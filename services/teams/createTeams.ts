@@ -49,7 +49,6 @@ export async function createTeam(input: CreateTeamInput): Promise<string> {
 
   await setDoc(doc(db, "users", input.createdBy, "memberships", teamRef.id), {
     teamId: teamRef.id,
-    roles: ["coach"],
     teamName: input.name, // cache pre zoznam tímov
     joinedAt: serverTimestamp(),
   });
