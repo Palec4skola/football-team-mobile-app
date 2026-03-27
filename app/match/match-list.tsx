@@ -57,8 +57,7 @@ export default function MatchListScreen() {
             Detail
           </Button>
 
-          {isCoach && (
-            <>
+          {isCoach ? (
               <Button
                 onPress={() =>
                   router.push({
@@ -69,12 +68,12 @@ export default function MatchListScreen() {
               >
                 Upraviť
               </Button>
-
+          ):null}
+          {isCoach?(
               <Button onPress={() => deleteMatch(item.id)} textColor="red">
                 Zmazať
               </Button>
-            </>
-          )}
+          ):null}
         </Card.Actions>
       </Card>
     );

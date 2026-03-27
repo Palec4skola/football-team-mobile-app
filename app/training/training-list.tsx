@@ -2,19 +2,22 @@ import { useTeamTrainings } from "@/hooks/training/useTeamTrainings";
 import { useTrainingActions } from "@/hooks/training/useTrainingActions";
 import { useRouter } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
-import React from "react";
+import React, { useState } from "react";
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
-import { Button, Card, Text } from "react-native-paper";
+import { Button, Card, Text, SegmentedButtons } from "react-native-paper";
 import { useMyTeamRoles } from "@/hooks/useMyTeamRoles";
-import { auth } from "@/firebase"
+import { auth } from "@/firebase";
 
 export default function TrainingListScreen() {
   const router = useRouter();
   const params = useSearchParams();
-  const teamId = params.get("teamId")?? undefined;
-
-  const { trainings,loading } = useTeamTrainings(teamId);
-const {isCoach,loadingRoles } = useMyTeamRoles(teamId,auth.currentUser?.uid);
+  const teamId = params.get("teamId") ?? undefined;
+  const [filter, setFilter] = useState<"upcoming" | "past" | "all">("upcoming");
+  const { trainings, loading } = useTeamTrainings(teamId, filter);
+  const { isCoach, loadingRoles } = useMyTeamRoles(
+    teamId,
+    auth.currentUser?.uid,
+  );
   const { deleteTraining } = useTrainingActions(teamId);
 
   if (loading || loadingRoles) {
@@ -50,24 +53,24 @@ const {isCoach,loadingRoles } = useMyTeamRoles(teamId,auth.currentUser?.uid);
             Detail
           </Button>
 
-          {isCoach && (
-            <>
-              <Button
-                onPress={() =>
-                  router.push({
-                    pathname: "/training/edit-training",
-                    params: { teamId, trainingId: item.id },
-                  })
-                }
-              >
-                Upraviť
-              </Button>
+          {isCoach ? (
+            <Button
+              onPress={() =>
+                router.push({
+                  pathname: "/training/edit-training",
+                  params: { teamId, trainingId: item.id },
+                })
+              }
+            >
+              Upraviť
+            </Button>
+          ) : null}
 
-              <Button onPress={() => deleteTraining(item.id)} textColor="red">
-                Zmazať
-              </Button>
-            </>
-          )}
+          {isCoach ? (
+            <Button onPress={() => deleteTraining(item.id)} textColor="red">
+              Zmazať
+            </Button>
+          ) : null}
         </Card.Actions>
       </Card>
     );
@@ -89,6 +92,18 @@ const {isCoach,loadingRoles } = useMyTeamRoles(teamId,auth.currentUser?.uid);
           Vytvoriť tréning
         </Button>
       )}
+      <SegmentedButtons
+        value={filter}
+        onValueChange={(value) =>
+          setFilter(value as "upcoming" | "past" | "all")
+        }
+        buttons={[
+          { value: "upcoming", label: "Nadchádzajúce" },
+          { value: "past", label: "Minulé" },
+          { value: "all", label: "Všetky" },
+        ]}
+        style={styles.filter}
+      />
 
       {trainings.length === 0 ? (
         <Text>Žiadne tréningy zatiaľ.</Text>
@@ -114,5 +129,13 @@ const styles = StyleSheet.create({
   card: {
     marginHorizontal: 16,
     marginVertical: 8,
+  },
+  filter: {
+    marginHorizontal: 16,
+    marginBottom: 12,
+  },
+  emptyText: {
+    marginHorizontal: 16,
+    marginTop: 8,
   },
 });

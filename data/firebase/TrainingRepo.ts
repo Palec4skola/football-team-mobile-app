@@ -91,14 +91,44 @@ export const trainingRepo = {
     await deleteDoc(ref);
   },
 
-  watchByTeam(
-    teamId: string,
-    cb: (rows: TrainingModel[]) => void,
-  ): Unsubscribe {
+  watchByTeam(teamId: string, cb: (rows: TrainingModel[]) => void) {
     const colRef = collection(db, "teams", teamId, "trainings");
-     const today = new Date();
-  today.setHours(0, 0, 0, 0);
-    const q = query(colRef,where("startsAt",">=",Timestamp.fromDate(today)), orderBy("startsAt", "asc"));
+
+    const q = query(colRef, orderBy("startsAt", "asc"));
+
+    return onSnapshot(q, (snap) => {
+      cb(snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })));
+    });
+  },
+
+  watchUpcomingByTeam(teamId: string, cb: (rows: TrainingModel[]) => void) {
+    const colRef = collection(db, "teams", teamId, "trainings");
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const q = query(
+      colRef,
+      where("startsAt", ">=", Timestamp.fromDate(today)),
+      orderBy("startsAt", "asc"),
+    );
+
+    return onSnapshot(q, (snap) => {
+      cb(snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })));
+    });
+  },
+
+  watchPastByTeam(teamId: string, cb: (rows: TrainingModel[]) => void) {
+    const colRef = collection(db, "teams", teamId, "trainings");
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const q = query(
+      colRef,
+      where("startsAt", "<", Timestamp.fromDate(today)),
+      orderBy("startsAt", "desc"), // najnovšie minulé hore
+    );
 
     return onSnapshot(q, (snap) => {
       cb(snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })));

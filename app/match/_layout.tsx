@@ -42,7 +42,7 @@ export default function TabsLayout() {
             title: "Player",
           }}
         />
-      </Stack>{" "}
+      </Stack>
     </GestureHandlerRootView>
   );
 }
