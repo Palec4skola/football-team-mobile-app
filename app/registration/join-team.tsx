@@ -69,7 +69,7 @@ export default function JoinTeam() {
     
       teamRepo.addMember(teamId, uid, ["player"], firstName, lastName, photoURL);
       // 2) Zápis členstva do užívateľa
-      userRepo.addMembership(uid,teamId,teamName, ["player"]);
+      userRepo.addMembership(uid,teamId,teamName);
       
       Alert.alert("Úspech", "Úspešne si sa pridal do tímu");
       router.replace("/(tabs)/team");

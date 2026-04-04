@@ -1,4 +1,3 @@
-import { Picker } from "@react-native-picker/picker";
 import { useFocusEffect, useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -9,7 +8,7 @@ import {
   View,
   ScrollView,
 } from "react-native";
-import { Button, Card, Divider, Text } from "react-native-paper";
+import { Button, Card, Text } from "react-native-paper";
 
 import { auth, db } from "../../firebase";
 import profileStyles from "@/styles/profile.styles";
@@ -22,9 +21,9 @@ export default function Profile() {
 
   const [user, setUser] = useState<UserModel | null>(null);
   const [loading, setLoading] = useState(true);
-  const [teamName, setTeamName] = useState<string | null>(null);
-  const [teamList, setTeamList] = useState<{ id: string; name: string }[]>([]);
-  const [activeTeamId, setActiveTeamId] = useState<string | null>(null);
+  // const [teamName, setTeamName] = useState<string | null>(null);
+  // const [teamList, setTeamList] = useState<{ id: string; name: string }[]>([]);
+  // const [activeTeamId, setActiveTeamId] = useState<string | null>(null);
   const { uploading, pickAndUploadPhoto, deletePhoto } = useProfilePhoto(
     auth.currentUser?.uid ?? "",
   );
@@ -36,9 +35,9 @@ export default function Profile() {
       const uid = auth.currentUser?.uid;
       if (!uid) {
         setUser(null);
-        setTeamList([]);
-        setTeamName(null);
-        setActiveTeamId(null);
+        // setTeamList([]);
+        // setTeamName(null);
+        // setActiveTeamId(null);
         return;
       }
 
@@ -48,7 +47,7 @@ export default function Profile() {
       const ids: string[] =
         userData?.teams || (userData?.teamId ? [userData.teamId] : []);
 
-      setActiveTeamId(ids.length > 0 ? ids[0] : null);
+      // setActiveTeamId(ids.length > 0 ? ids[0] : null);
 
       if (ids.length > 0) {
         const teamPromises = ids.map(async (id) => {
@@ -64,13 +63,13 @@ export default function Profile() {
         });
 
         const teams = await Promise.all(teamPromises);
-        setTeamList(teams);
+        // setTeamList(teams);
 
-        const activeTeam = teams.find((t) => t.id === ids[0]);
-        setTeamName(activeTeam ? activeTeam.name : null);
+        // const activeTeam = teams.find((t) => t.id === ids[0]);
+        // setTeam.Name(activeTeam ? activeTeam.name : null);
       } else {
-        setTeamList([]);
-        setTeamName(null);
+        // setTeamList([]);
+        // setTeamName(null);
       }
     } catch {
       Alert.alert("Chyba", "Nepodarilo sa načítať profil.");
@@ -124,9 +123,9 @@ export default function Profile() {
 
                   <Text style={profileStyles.userEmail}>{user.email}</Text>
 
-                  <Divider style={profileStyles.divider} />
+                  {/* <Divider style={profileStyles.divider} /> */}
 
-                  {teamList.length > 1 ? (
+                  {/* {teamList.length > 1 ? (
                     <View style={profileStyles.teamBox}>
                       <Text style={profileStyles.sectionLabel}>
                         Aktívny tím
@@ -164,7 +163,7 @@ export default function Profile() {
                         Zatiaľ nie ste v žiadnom tíme
                       </Text>
                     </View>
-                  )}
+                  )} */}
                 </>
               ) : (
                 <Text style={profileStyles.errorText}>

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
-import { Button, Card, Text } from "react-native-paper";
+import { Button, Card, SegmentedButtons, Text } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
 
@@ -13,8 +13,9 @@ export default function MatchListScreen() {
   const router = useRouter();
   const params = useSearchParams();
   const teamId = params.get("teamId") ?? undefined;
+  const [filter, setFilter] = useState<"upcoming" | "past" | "all">("upcoming");
 
-  const { matches, loading } = useTeamMatches(teamId);
+const { matches, loading } = useTeamMatches(teamId, filter);
   const { isCoach, loadingRoles } = useMyTeamRoles(teamId,auth.currentUser?.uid);
   const { deleteMatch } = useMatchActions(teamId);
 
@@ -95,6 +96,18 @@ export default function MatchListScreen() {
           Pridať zápas
         </Button>
       )}
+      <SegmentedButtons
+  value={filter}
+  onValueChange={(value) =>
+    setFilter(value as "upcoming" | "past" | "all")
+  }
+  buttons={[
+    { value: "upcoming", label: "Nadchádzajúce" },
+    { value: "past", label: "Minulé" },
+    { value: "all", label: "Všetky" },
+  ]}
+  style={styles.filter}
+/>
 
       {matches.length === 0 ? (
         <Text style={styles.empty}>Žiadne zápasy zatiaľ.</Text>
@@ -116,4 +129,5 @@ const styles = StyleSheet.create({
   addButton: { marginHorizontal: 16, marginBottom: 8 },
   card: { marginHorizontal: 16, marginVertical: 8 },
   empty: { marginHorizontal: 16, marginTop: 12 },
+  filter: { marginHorizontal: 16, marginBottom: 12 },
 });

@@ -279,4 +279,44 @@ export const matchRepo = {
       (err) => onError?.(err as Error),
     );
   },
+  watchUpcomingByTeam(teamId: string, cb: (rows: Match[]) => void) {
+  const colRef = collection(db, "teams", teamId, "matches");
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const q = query(
+    colRef,
+    where("date", ">=", Timestamp.fromDate(today)),
+    orderBy("date", "asc")
+  );
+
+  return onSnapshot(q, (snap) => {
+    cb(snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })));
+  });
+},
+watchPastByTeam(teamId: string, cb: (rows: Match[]) => void) {
+  const colRef = collection(db, "teams", teamId, "matches");
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const q = query(
+    colRef,
+    where("date", "<", Timestamp.fromDate(today)),
+    orderBy("date", "desc")
+  );
+
+  return onSnapshot(q, (snap) => {
+    cb(snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })));
+  });
+},
+watchByTeam(teamId: string, cb: (rows: Match[]) => void) {
+  const colRef = collection(db, "teams", teamId, "matches");
+  const q = query(colRef, orderBy("date", "asc"));
+
+  return onSnapshot(q, (snap) => {
+    cb(snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })));
+  });
+}
 };

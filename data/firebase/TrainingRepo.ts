@@ -135,17 +135,6 @@ export const trainingRepo = {
     });
   },
 
-  watchOne(
-    teamId: string,
-    trainingId: string,
-    cb: (t: any | null) => void,
-  ): Unsubscribe {
-    const ref = doc(db, "teams", teamId, "trainings", trainingId);
-    return onSnapshot(ref, (snap) =>
-      cb(snap.exists() ? { id: snap.id, ...(snap.data() as any) } : null),
-    );
-  },
-
   async listTrainingsFrom(teamId: string, fromDate: Date): Promise<Training[]> {
     const trainingsRef = collection(db, "teams", teamId, "trainings");
     const qTrainings = query(
