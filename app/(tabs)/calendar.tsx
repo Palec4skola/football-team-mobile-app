@@ -1,17 +1,28 @@
 import React, { useMemo, useState } from "react";
-import { View, Text, FlatList, Pressable, ActivityIndicator } from "react-native";
-import {useRouter } from "expo-router";
+import {
+  View,
+  Text,
+  FlatList,
+  Pressable,
+  ActivityIndicator,
+  Modal,
+} from "react-native";
+import { useRouter } from "expo-router";
 import { CalendarList } from "react-native-calendars";
 import { useCalendarEventsRange } from "@/hooks/useCalendarEventRange";
 import { styles } from "@/styles/teamCalendar.styles";
 import { useActiveTeam } from "@/hooks/useActiveTeam";
 
 function monthBoundsFromVisible(visibleMonths: Array<{ year: number; month: number }>) {
-  const min = visibleMonths.reduce((a, b) => (a.year * 12 + a.month < b.year * 12 + b.month ? a : b));
-  const max = visibleMonths.reduce((a, b) => (a.year * 12 + a.month > b.year * 12 + b.month ? a : b));
+  const min = visibleMonths.reduce((a, b) =>
+    a.year * 12 + a.month < b.year * 12 + b.month ? a : b
+  );
+  const max = visibleMonths.reduce((a, b) =>
+    a.year * 12 + a.month > b.year * 12 + b.month ? a : b
+  );
 
-  const from = new Date(min.year, min.month - 2, 1, 0, 0, 0, 0); // buffer -1 mesiac
-  const to = new Date(max.year, max.month + 1, 1, 0, 0, 0, 0);   // buffer +1 mesiac
+  const from = new Date(min.year, min.month - 2, 1, 0, 0, 0, 0);
+  const to = new Date(max.year, max.month + 1, 1, 0, 0, 0, 0);
   return { from, to };
 }
 
@@ -26,10 +37,12 @@ function todayKey() {
 export default function TeamCalendarScreen() {
   const router = useRouter();
   const { teamId } = useActiveTeam();
-  
+
   const { loading, eventsByDay, loadRange } = useCalendarEventsRange(teamId);
-  
+
   const [selectedDay, setSelectedDay] = useState<string>(todayKey());
+  const [dayModalVisible, setDayModalVisible] = useState(false);
+
   const dayEvents = eventsByDay[selectedDay] ?? [];
 
   const markedDates = useMemo(() => {
@@ -57,6 +70,8 @@ export default function TeamCalendarScreen() {
   }, [eventsByDay, selectedDay]);
 
   const openEvent = (e: { kind: "training" | "match"; id: string }) => {
+    setDayModalVisible(false);
+
     if (e.kind === "training") {
       router.push({
         pathname: "/training/training-detail",
@@ -79,7 +94,10 @@ export default function TeamCalendarScreen() {
         showScrollIndicator={false}
         markingType="multi-dot"
         markedDates={markedDates}
-        onDayPress={(d) => setSelectedDay(d.dateString)}
+        onDayPress={(d) => {
+          setSelectedDay(d.dateString);
+          setDayModalVisible(true);
+        }}
         onVisibleMonthsChange={(months) => {
           if (!months?.length) return;
           const { from, to } = monthBoundsFromVisible(months);
@@ -87,36 +105,77 @@ export default function TeamCalendarScreen() {
         }}
       />
 
-      <View style={styles.dayHeader}>
-        <Text style={styles.dayHeaderText}>Udalosti: {selectedDay}</Text>
-        {loading ? <ActivityIndicator /> : null}
-      </View>
-
-      <FlatList
-        data={dayEvents}
-        keyExtractor={(i) => `${i.kind}:${i.id}`}
-        contentContainerStyle={styles.listContent}
-        ItemSeparatorComponent={() => <View style={styles.sep} />}
-        ListEmptyComponent={<Text style={styles.empty}>V tento deň nič nie je.</Text>}
-        renderItem={({ item }) => (
-          <Pressable onPress={() => openEvent(item)} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
-            <View style={styles.cardLeft}>
-              <Text style={styles.cardTitle}>
-                {item.kind === "training" ? "Tréning" : "Zápas"} •{" "}
-                {item.startsAt.toLocaleTimeString("sk-SK", { hour: "2-digit", minute: "2-digit" })}
-              </Text>
-              <Text style={styles.cardSubtitle}>
-                {item.title}
-                {item.subtitle ? ` — ${item.subtitle}` : ""}
-              </Text>
+      <Modal
+        visible={dayModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setDayModalVisible(false)}
+      >
+        <Pressable
+          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)", justifyContent: "flex-end" }}
+          onPress={() => setDayModalVisible(false)}
+        >
+          <Pressable
+            style={{
+              backgroundColor: "#fff",
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              padding: 16,
+              minHeight: 250,
+              maxHeight: "70%",
+            }}
+            onPress={() => {}}
+          >
+            <View style={styles.dayHeader}>
+              <Text style={styles.dayHeaderText}>Udalosti: {selectedDay}</Text>
+              {loading ? <ActivityIndicator /> : null}
             </View>
 
-            <View style={[styles.badge, item.kind === "training" ? styles.badgeTraining : styles.badgeMatch]}>
-              <Text style={styles.badgeText}>{item.kind === "training" ? "TR" : "ZÁ"}</Text>
-            </View>
+            <FlatList
+              data={dayEvents}
+              keyExtractor={(i) => `${i.kind}:${i.id}`}
+              contentContainerStyle={styles.listContent}
+              ItemSeparatorComponent={() => <View style={styles.sep} />}
+              ListEmptyComponent={
+                <Text style={styles.empty}>V tento deň nič nie je.</Text>
+              }
+              renderItem={({ item }) => (
+                <Pressable
+                  onPress={() => openEvent(item)}
+                  style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+                >
+                  <View style={styles.cardLeft}>
+                    <Text style={styles.cardTitle}>
+                      {item.kind === "training" ? "Tréning" : "Zápas"} •{" "}
+                      {item.startsAt.toLocaleTimeString("sk-SK", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </Text>
+                    <Text style={styles.cardSubtitle}>
+                      {item.title}
+                      {item.subtitle ? ` — ${item.subtitle}` : ""}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={[
+                      styles.badge,
+                      item.kind === "training"
+                        ? styles.badgeTraining
+                        : styles.badgeMatch,
+                    ]}
+                  >
+                    <Text style={styles.badgeText}>
+                      {item.kind === "training" ? "TR" : "ZÁ"}
+                    </Text>
+                  </View>
+                </Pressable>
+              )}
+            />
           </Pressable>
-        )}
-      />
+        </Pressable>
+      </Modal>
     </View>
   );
 }
