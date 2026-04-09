@@ -19,7 +19,6 @@ export default function TrainingListScreen() {
     auth.currentUser?.uid,
   );
   const { deleteTraining } = useTrainingActions(teamId);
-
   if (loading || loadingRoles) {
     return (
       <View style={styles.center}>

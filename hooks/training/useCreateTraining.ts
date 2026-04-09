@@ -2,7 +2,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { Alert } from "react-native";
 import { auth } from "@/firebase";
-import { trainingRepo } from "@/data/firebase/TrainingRepo";
+import { trainingRepo, TrainingVideo } from "@/data/firebase/TrainingRepo";
 import { alertsRepo } from "@/data/firebase/AlertsRepo";
 
 export function useCreateTraining(teamId?: string | null) {
@@ -10,6 +10,7 @@ export function useCreateTraining(teamId?: string | null) {
   const [description, setDescription] = useState("");
   const [startsAt, setStartsAt] = useState(new Date());
   const [submitting, setSubmitting] = useState(false);
+  const [video, setVideo] = useState<TrainingVideo | null>(null);
 
   const canSubmit = useMemo(() => {
     return !!teamId && name.trim().length > 0 && !submitting;
@@ -41,20 +42,22 @@ export function useCreateTraining(teamId?: string | null) {
         description,
         startsAt,
         createdBy: userId,
+        video,
       });
       await alertsRepo.create({
-  teamId,
-  type: "training_created",
-  title: "Nový tréning",
-  body: name,
-  targetKind: "training",
-  targetId: trainingId,
-  createdBy: uid,
-});
+        teamId,
+        type: "training_created",
+        title: "Nový tréning",
+        body: name,
+        targetKind: "training",
+        targetId: trainingId,
+        createdBy: uid,
+      });
       // reset form
       setName("");
       setDescription("");
       setStartsAt(new Date());
+      setVideo(null);
 
       return trainingId;
     } catch (e: any) {
@@ -63,7 +66,7 @@ export function useCreateTraining(teamId?: string | null) {
     } finally {
       setSubmitting(false);
     }
-  }, [teamId, name, description, startsAt]);
+  }, [teamId, name, description, startsAt, video]);
 
   return {
     name,
@@ -72,6 +75,8 @@ export function useCreateTraining(teamId?: string | null) {
     setDescription,
     startsAt,
     setStartsAt,
+    video,
+    setVideo,
     submitting,
     canSubmit,
     submit,

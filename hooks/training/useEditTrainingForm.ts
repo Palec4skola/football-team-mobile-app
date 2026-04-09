@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
 import { useTraining } from "./useTraining";
 import { useTrainingActions } from "./useTrainingActions";
+import { TrainingVideo } from "@/data/firebase/TrainingRepo";
 
 function toDateOrNow(value: any): Date {
   // Firestore Timestamp -> Date
@@ -20,6 +21,7 @@ export function useEditTrainingForm(teamId?: string | null, trainingId?: string 
   const [description, setDescription] = useState("");
   const [startsAt, setStartsAt] = useState(new Date());
   const [initialized, setInitialized] = useState(false);
+  const [video, setVideo] = useState<TrainingVideo | null>(null);
 
   // naplň form len raz po načítaní tréningu
   useEffect(() => {
@@ -29,6 +31,7 @@ export function useEditTrainingForm(teamId?: string | null, trainingId?: string 
     setDescription(training.description ?? "");
     setStartsAt(toDateOrNow(training.startsAt));
     setInitialized(true);
+    setVideo(training.video ?? null);
   }, [training, initialized]);
 
   const canSubmit = useMemo(() => {
@@ -49,6 +52,7 @@ export function useEditTrainingForm(teamId?: string | null, trainingId?: string 
       name,
       description,
       startsAt,
+      video,
     });
 
     return true;
@@ -65,6 +69,8 @@ export function useEditTrainingForm(teamId?: string | null, trainingId?: string 
     setDescription,
     startsAt,
     setStartsAt,
+    video,
+  setVideo,
     submit,
   };
 }

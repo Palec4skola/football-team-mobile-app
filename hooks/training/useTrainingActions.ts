@@ -1,4 +1,4 @@
-import { trainingRepo } from "@/data/firebase/TrainingRepo";
+import { trainingRepo, TrainingVideo } from "@/data/firebase/TrainingRepo";
 import { useState } from "react";
 import { Alert } from "react-native";
 
@@ -7,7 +7,7 @@ export function useTrainingActions(teamId?: string | null) {
 
   const updateTraining = async (
     trainingId: string,
-    patch: { name?: string; description?: string; startsAt?: Date },
+    patch: { name?: string; description?: string; startsAt?: Date; video?: TrainingVideo | null },
   ) => {
     if (!teamId) return;
     setLoading(true);

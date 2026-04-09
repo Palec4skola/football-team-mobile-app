@@ -1,18 +1,23 @@
 import { db } from "@/firebase";
-import { collection, getDocs, query, where, Timestamp } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  Timestamp,
+} from "firebase/firestore";
 
 export type TrainingDoc = {
   startsAt: Timestamp;
   name?: string;
-    description?: string;
-
+  description?: string;
 };
 
 export type MatchDoc = {
   date: Timestamp;
   opponent?: string;
-    location?: string;
-    result?: string;
+  location?: string;
+  result?: string;
 };
 
 export const calendarRepo = {

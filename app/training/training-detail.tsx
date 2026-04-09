@@ -1,7 +1,7 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo } from "react";
-import { View } from "react-native";
-import { ActivityIndicator, Text } from "react-native-paper";
+import { Linking, View, Alert } from "react-native";
+import { ActivityIndicator, Text, Button } from "react-native-paper";
 import { auth } from "../../firebase";
 
 import { useMyTeamRoles } from "@/hooks/useMyTeamRoles";
@@ -15,6 +15,7 @@ import {
   attendanceRepo,
   AttendanceStatus,
 } from "@/data/firebase/AttendanceRepo";
+import { useActiveTeam } from "@/hooks/useActiveTeam";
 
 export default function TrainingDetailScreen() {
   const router = useRouter();
@@ -24,6 +25,8 @@ export default function TrainingDetailScreen() {
   }>();
 
   const userId = auth.currentUser?.uid;
+  const { teamLevel } = useActiveTeam();
+    const isProfessional = teamLevel === "professional";
 
   useEffect(() => {
     if (!teamId || !trainingId) {
@@ -33,13 +36,13 @@ export default function TrainingDetailScreen() {
 
   const { training, loading: loadingTraining } = useTraining(
     teamId,
-    trainingId
+    trainingId,
   );
   const { members, loading: loadingMembers } = useTeamMembers(teamId);
   const { byUserId, loading: loadingAtt } = useAttendance(
     teamId,
     trainingId,
-    "trainings"
+    "trainings",
   );
   const { isCoach, loadingRoles } = useMyTeamRoles(teamId, userId);
 
@@ -52,6 +55,19 @@ export default function TrainingDetailScreen() {
       ? training.startsAt.toDate().toLocaleString()
       : String(training.startsAt);
   }, [training?.startsAt]);
+
+  const handleOpenVideo = async () => {
+    const url = training?.video?.url;
+    if (!url) return;
+
+    const supported = await Linking.canOpenURL(url);
+    if (!supported) {
+      Alert.alert("Chyba", "Video sa nepodarilo otvoriť.");
+      return;
+    }
+
+    await Linking.openURL(url);
+  };
 
   if (!teamId || !trainingId) {
     return null;
@@ -75,16 +91,13 @@ export default function TrainingDetailScreen() {
 
   const canEdit = (rowUserId: string) => isCoach || rowUserId === userId;
 
-  const setAttendance = async (
-    rowUserId: string,
-    status: AttendanceStatus
-  ) => {
+  const setAttendance = async (rowUserId: string, status: AttendanceStatus) => {
     await attendanceRepo.setAttendance(
       teamId,
       trainingId,
       "trainings",
       rowUserId,
-      status
+      status,
     );
   };
 
@@ -100,7 +113,22 @@ export default function TrainingDetailScreen() {
       >
         <Text variant="titleMedium">{training.name}</Text>
         <Text>Dátum: {formattedDate}</Text>
-        {training.description ? <Text>Popis: {training.description}</Text> : null}
+        {training.description ? (
+          <Text>Popis: {training.description}</Text>
+        ) : null}
+        {isProfessional && training.video?.url ? (
+  <View style={{ marginTop: 12 }}>
+    {training.video.name ? (
+      <Text style={{ marginBottom: 8 }}>
+        Video: {training.video.name}
+      </Text>
+    ) : null}
+
+    <Button mode="contained" onPress={handleOpenVideo}>
+      Prehrať video
+    </Button>
+  </View>
+) : null}
       </View>
 
       <Text variant="titleMedium" style={{ marginBottom: 8 }}>

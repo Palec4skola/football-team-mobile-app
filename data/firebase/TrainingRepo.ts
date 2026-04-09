@@ -16,11 +16,18 @@ import {
 } from "firebase/firestore";
 import { db } from "@/firebase";
 
+export type TrainingVideo = {
+  url: string;
+  path: string;
+  name: string;
+};
+
 export type TrainingModel = {
   id: string;
   name: string;
   description?: string;
   startsAt?: any; // Timestamp
+  video?: TrainingVideo | null;
 };
 
 export type Training = {
@@ -33,12 +40,14 @@ export type CreateTrainingInput = {
   description?: string;
   startsAt: Date; // v UI Date, do Firestore pôjde Timestamp
   createdBy: string;
+  video?: TrainingVideo | null;
 };
 
 export type UpdateTrainingInput = {
   name?: string;
   description?: string;
   startsAt?: Date;
+  video?: TrainingVideo | null;
 };
 
 function mapDoc<T = DocumentData>(snap: any): T {
@@ -68,6 +77,7 @@ export const trainingRepo = {
       startsAt: Timestamp.fromDate(input.startsAt),
       createdAt: serverTimestamp(),
       createdBy: input.createdBy,
+      video: input.video || null,
     });
 
     return trainingRef.id;
@@ -81,6 +91,7 @@ export const trainingRepo = {
     };
     if (input.name != null) patch.name = input.name.trim();
     if (input.description != null) patch.description = input.description.trim();
+    if (input.video !== undefined) patch.video = input.video;
     if (input.startsAt != null)
       patch.startsAt = Timestamp.fromDate(input.startsAt);
     await updateDoc(ref, patch);

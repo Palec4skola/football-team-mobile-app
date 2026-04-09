@@ -1,7 +1,7 @@
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { Alert } from "react-native";
-import { uploadUserProfilePhoto, removeUserProfilePhoto } from "@/data/firebase/PhotoRepo";
+import { uploadUserProfilePhoto, removeUserProfilePhoto } from "@/data/firebase/MediaRepo";
 
 export function useProfilePhoto(uid: string) {
   const [uploading, setUploading] = useState(false);
