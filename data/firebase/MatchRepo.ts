@@ -12,6 +12,7 @@ import {
   Timestamp,
   updateDoc,
   where,
+  limit,
   type Unsubscribe,
   type FieldValue,
   type QueryDocumentSnapshot,
@@ -318,5 +319,26 @@ watchByTeam(teamId: string, cb: (rows: Match[]) => void) {
   return onSnapshot(q, (snap) => {
     cb(snap.docs.map((d) => ({ id: d.id, ...(d.data() as any) })));
   });
-}
+},
+
+ async getNextMatch(teamId: string): Promise<Match | null> {
+    const now = new Date();
+
+    const q = query(
+      collection(db, "teams", teamId, "matches"),
+      where("date", ">=", now),
+      orderBy("date", "asc"),
+      limit(1)
+    );
+
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) return null;
+
+    const docSnap = snapshot.docs[0];
+    return {
+      id: docSnap.id,
+      ...docSnap.data(),
+    } as Match;
+  },
 };

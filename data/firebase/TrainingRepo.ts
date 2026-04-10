@@ -13,6 +13,7 @@ import {
   where,
   getDocs,
   deleteDoc,
+  limit,
 } from "firebase/firestore";
 import { db } from "@/firebase";
 
@@ -158,5 +159,26 @@ export const trainingRepo = {
       id: d.id,
       ...(d.data() as any),
     })) as Training[];
+  },
+
+  async getNextTraining(teamId: string): Promise<TrainingModel | null> {
+    const now = new Date();
+
+    const q = query(
+      collection(db, "teams", teamId, "trainings"),
+      where("startsAt", ">=", now),
+      orderBy("startsAt", "asc"),
+      limit(1)
+    );
+
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) return null;
+
+    const docSnap = snapshot.docs[0];
+    return {
+      id: docSnap.id,
+      ...docSnap.data(),
+    } as TrainingModel;
   },
 };

@@ -67,14 +67,16 @@ export default function HomeScreen() {
   const onGoWellness = () =>
     router.push({ pathname: "/team/wellness", params: { teamId } });
   const onGoAttendance = () =>
-router.push({
-  pathname: "/team/attendance",
-  params: { teamId },
-});
+    router.push({
+      pathname: "/team/attendance",
+      params: { teamId },
+    });
+    if (!teamId) return null;
   // Professional vs Amateur
   if (teamLevel === "professional") {
     return (
       <HomeProfessional
+        teamId={teamId}
         onGoTrainings={onGoTrainings}
         onGoMatches={onGoMatches}
         onGoAnnouncements={onGoAnnouncements}
@@ -83,9 +85,10 @@ router.push({
       />
     );
   }
-
+  
   return (
     <HomeAmateur
+      teamId={teamId}
       onGoTrainings={onGoTrainings}
       onGoMatches={onGoMatches}
       onGoAnnouncements={onGoAnnouncements}

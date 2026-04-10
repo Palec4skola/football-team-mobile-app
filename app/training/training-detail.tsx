@@ -26,7 +26,7 @@ export default function TrainingDetailScreen() {
 
   const userId = auth.currentUser?.uid;
   const { teamLevel } = useActiveTeam();
-    const isProfessional = teamLevel === "professional";
+  const isProfessional = teamLevel === "professional";
 
   useEffect(() => {
     if (!teamId || !trainingId) {
@@ -117,18 +117,18 @@ export default function TrainingDetailScreen() {
           <Text>Popis: {training.description}</Text>
         ) : null}
         {isProfessional && training.video?.url ? (
-  <View style={{ marginTop: 12 }}>
-    {training.video.name ? (
-      <Text style={{ marginBottom: 8 }}>
-        Video: {training.video.name}
-      </Text>
-    ) : null}
+          <View style={{ marginTop: 12 }}>
+            {training.video.name ? (
+              <Text style={{ marginBottom: 8 }}>
+                Video: {training.video.name}
+              </Text>
+            ) : null}
 
-    <Button mode="contained" onPress={handleOpenVideo}>
-      Prehrať video
-    </Button>
-  </View>
-) : null}
+            <Button mode="contained" onPress={handleOpenVideo}>
+              Prehrať video
+            </Button>
+          </View>
+        ) : null}
       </View>
 
       <Text variant="titleMedium" style={{ marginBottom: 8 }}>

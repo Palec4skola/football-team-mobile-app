@@ -89,4 +89,57 @@ export const homeStyles = StyleSheet.create({
     height: 6,
     borderRadius: 999,
   },
+  upcomingCard: {
+  borderRadius: 24,
+  marginBottom: 18,
+  overflow: "hidden",
+},
+
+upcomingInner: {
+  padding: 16,
+},
+
+upcomingTitle: {
+  fontSize: 20,
+  fontWeight: "800",
+  marginBottom: 14,
+  color: "#111827",
+},
+
+upcomingGrid: {
+  gap: 12,
+},
+
+upcomingItem: {
+  borderRadius: 18,
+  backgroundColor: "#F8FAFC",
+  padding: 14,
+},
+
+upcomingHeader: {
+  flexDirection: "row",
+  alignItems: "center",
+  gap: 8,
+  marginBottom: 10,
+},
+
+upcomingLabel: {
+  fontSize: 15,
+  fontWeight: "700",
+  color: "#111827",
+},
+
+upcomingMain: {
+  fontSize: 17,
+  fontWeight: "800",
+  color: "#111827",
+  marginBottom: 4,
+},
+
+upcomingText: {
+  fontSize: 14,
+  color: "#6B7280",
+  marginBottom: 2,
+},
+
 });
