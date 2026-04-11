@@ -77,7 +77,7 @@ export const styles = StyleSheet.create({
   },
   statsCard: {
     borderRadius: 20,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#ffffff",
   },
   statsLoadingWrap: {
     padding: 18,

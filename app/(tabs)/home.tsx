@@ -13,19 +13,7 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const { loading, teamId, teamLevel } = useActiveTeam();
-  // header button (chat)
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Button
-          onPress={() => router.push("/chat/chat-list")}
-          style={{ marginRight: 12 }}
-        >
-          <Ionicons name="chatbubbles-outline" size={28} color="#007AFF" />
-        </Button>
-      ),
-    });
-  }, [navigation, router]);
+  
 
   // Guard 1: loading
   if (loading) {

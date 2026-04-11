@@ -83,13 +83,7 @@ export default function TeamManagement() {
       keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
-      {" "}
-      <View style={styles.header}>
-        <Text style={styles.title}>Správa tímu</Text>
-        <Text style={styles.subtitle}>
-          Prehľad členov tímu a ich správa na jednom mieste.
-        </Text>
-      </View>
+      
       {isCoach && (
         <Card style={styles.infoCard} mode="elevated">
           <View style={styles.infoCardContent}>
@@ -124,12 +118,7 @@ export default function TeamManagement() {
       )}
       {isProfessional && (
         <View style={styles.statsSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Štatistika tímu</Text>
-            <Text style={styles.sectionSubtitle}>
-              Automaticky vypočítaná z odohraných zápasov.
-            </Text>
-          </View>
+          
 
           {statsLoading ? (
             <Card style={styles.statsCard} mode="elevated">
