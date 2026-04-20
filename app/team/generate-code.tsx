@@ -52,7 +52,7 @@ export default function GenerateCode() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Vygeneruj pozývací kód tímu</Text>
+      <Text style={styles.title}>Pošli tento kód hráčovi:</Text>
       <Text style={styles.code}>{code}</Text>
       <Button onPress={handleSaveCode}>
         <Text>Uložiť kód</Text>

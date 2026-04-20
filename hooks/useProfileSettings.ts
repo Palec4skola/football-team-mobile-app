@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { updatePassword } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
 
-import { auth, db } from "@/firebase";
-import { userRepo, UserModel } from "@/data/firebase/UserRepo"; // uprav cestu
+import { auth } from "@/firebase";
+import { userRepo, UserModel, getUserMembershipTeamIds } from "@/data/firebase/UserRepo"; // uprav cestu
+import { teamRepo } from "@/data/firebase/TeamRepo";
 
 export function useProfileSettings() {
   const [user, setUser] = useState<(UserModel & { id: string }) | null>(null);
@@ -64,10 +64,17 @@ export function useProfileSettings() {
     try {
       setSavingProfile(true);
 
-      await updateDoc(doc(db, "users", user.id), {
+      await userRepo.updateProfile(user.id, {
         firstName: trimmedFirstName,
         lastName: trimmedLastName,
       });
+
+      await teamRepo.updateMemberNameAcrossTeams(
+        user.id,
+        trimmedFirstName,
+        trimmedLastName,
+        await getUserMembershipTeamIds(user.id)
+      );
 
       setUser((prev) =>
         prev

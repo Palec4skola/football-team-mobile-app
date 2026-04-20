@@ -111,6 +111,13 @@ export default function LoginScreen() {
                 >
                   Zaregistruj sa
                 </Button>
+                <Button
+                  mode="text"
+                  onPress={() => router.push("../registration/forgotPassword")}
+                  compact
+                >
+                  Zabudli ste heslo?
+                </Button>
               </View>
             </View>
           </Card>

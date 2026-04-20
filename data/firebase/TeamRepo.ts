@@ -173,4 +173,20 @@ export const teamRepo = {
       cb(snap.exists() ? { id: snap.id, ...(snap.data() as any) } : null);
     });
   },
+
+  async updateMemberNameAcrossTeams(
+    uid: string,
+    firstName: string,
+    lastName: string,
+    teamIds: string[],
+  ): Promise<void> {
+    const updates = teamIds.map((teamId) =>
+      updateDoc(doc(db, "teams", teamId, "members", uid), {
+        firstName,
+        lastName,
+      })
+    );
+
+    await Promise.all(updates);
+  },
 };

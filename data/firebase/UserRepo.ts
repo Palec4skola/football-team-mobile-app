@@ -122,6 +122,18 @@ export const userRepo = {
       { merge: true },
     );
   },
+
+  async updateProfile(
+    uid: string,
+    data: { firstName: string; lastName: string },
+  ): Promise<void> {
+    const ref = doc(db, "users", uid);
+
+    await updateDoc(ref, {
+      firstName: data.firstName,
+      lastName: data.lastName,
+    });
+  },
   
 
   normalizeRoles,

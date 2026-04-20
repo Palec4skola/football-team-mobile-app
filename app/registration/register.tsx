@@ -19,7 +19,7 @@ export default function RegisterScreen() {
 
   const { values, loading, setField, submit } = useRegisterForm(() => {
     Alert.alert("Úspech", "Registrácia prebehla úspešne!");
-    router.replace("/registration/choose-join-or-create");
+    router.replace("/registration/mailVerify");
   });
 
   const handleSubmit = async () => {
