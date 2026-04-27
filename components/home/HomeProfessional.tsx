@@ -49,8 +49,9 @@ function GridCard({
 }) {
   return (
     <Card style={s.gridItem} mode="elevated">
-      <TouchableRipple onPress={onPress} borderless style={s.gridRipple}>
-        <View style={s.gridInner}>
+  <View style={{ overflow: "hidden", borderRadius: 22 }}>
+    <TouchableRipple onPress={onPress} borderless style={s.gridRipple}>
+      <View style={s.gridInner}>
           <View style={[s.iconWrap, { backgroundColor: accent + "22" }]}>
             <MaterialCommunityIcons name={icon} size={24} color={accent} />
           </View>
@@ -68,6 +69,7 @@ function GridCard({
           </View>
         </View>
       </TouchableRipple>
+    </View>
     </Card>
   );
 }
@@ -91,7 +93,8 @@ export default function HomeProfessional({
   return (
     <ScrollView style={s.screen} contentContainerStyle={s.content}>
       <Card style={s.upcomingCard} mode="elevated">
-        <View style={s.upcomingInner}>
+        <View style={{ overflow: "hidden", borderRadius: 24 }}>
+          <View style={s.upcomingInner}>
           <Text style={s.upcomingTitle}>Najbližšie udalosti</Text>
 
           {isLoading ? (
@@ -197,6 +200,7 @@ export default function HomeProfessional({
             </View>
           )}
         </View>
+        </View>
       </Card>
 
       <View style={s.grid}>
@@ -217,6 +221,7 @@ export default function HomeProfessional({
           accent="#059669"
         />
       </View>
+      
     </ScrollView>
   );
 }

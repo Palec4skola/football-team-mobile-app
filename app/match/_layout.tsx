@@ -13,7 +13,7 @@ export default function TabsLayout() {
   };
 
   const handleOpenChat = () => {
-    router.push("../chat/chat-list");
+    router.push("../chat/chat");
   };
 
   const showBackArrow = pathname !== "..";
@@ -37,11 +37,21 @@ export default function TabsLayout() {
         }}
       >
         <Stack.Screen
-          name="player-profile"
-          options={{
-            title: "Player",
-          }}
-        />
+        name="match-list"
+        options={{ title: "Zápasy" }}
+      />
+      <Stack.Screen
+        name="match-detail"
+        options={{ title: "Detail zápasu" }}
+      />
+      <Stack.Screen
+        name="create-match"
+        options={{ title: "Vytvoriť zápas" }}
+      />
+      <Stack.Screen
+        name="edit-match"
+        options={{ title: "Upraviť zápas" }}
+      />
       </Stack>
     </GestureHandlerRootView>
   );

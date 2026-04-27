@@ -44,7 +44,6 @@ export const homeStyles = StyleSheet.create({
     width: "48%",
     borderRadius: 22,
     marginBottom: 14,
-    overflow: "hidden",
     backgroundColor: "#FFFFFF",
   },
   gridRipple: {
@@ -92,7 +91,6 @@ export const homeStyles = StyleSheet.create({
   upcomingCard: {
   borderRadius: 24,
   marginBottom: 18,
-  overflow: "hidden",
 },
 
 upcomingInner: {

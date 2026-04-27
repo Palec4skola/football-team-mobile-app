@@ -1,4 +1,3 @@
-// app/team/announcement-detail.tsx
 import React from "react";
 import {
   ActivityIndicator,
@@ -53,7 +52,7 @@ export default function AnnouncementDetailScreen() {
         onPress: async () => {
           try {
             await announcementRepo.remove(teamId, announcementId);
-            router.replace("/team/announcement");
+            router.back();
           } catch (error) {
             console.error("delete announcement error:", error);
             Alert.alert("Chyba", "Nepodarilo sa zmazať oznámenie.");
@@ -103,7 +102,7 @@ export default function AnnouncementDetailScreen() {
             style={styles.editButton}
             onPress={() =>
               router.push(
-                {pathname:"/team/editAnnouncement",params}
+                {pathname:"/announcements/editAnnouncement",params}
               )
             }
           >

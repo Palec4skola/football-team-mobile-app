@@ -12,7 +12,7 @@ export default function TabsLayout() {
   };
 
   const handleOpenChat = () => {
-    router.push('../chat/chat-list');
+    router.push('../chat/chat');
   };
 
   const showBackArrow = pathname !== '..';
@@ -37,7 +37,13 @@ export default function TabsLayout() {
       <Stack.Screen
         name="player-profile"
         options={{
-          title: 'Player',
+          title: 'Člen tímu',
+        }}
+      />
+      <Stack.Screen
+        name="profileSettings"
+        options={{
+          title: 'Nastavenia profilu',
         }}
       />
     </Stack>

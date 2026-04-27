@@ -25,10 +25,7 @@ export default function CreateTrainingScreen() {
     if (!newId) return;
 
     // po vytvorení choď na list alebo detail
-    router.replace({
-      pathname: "/training/training-list",
-      params: { teamId },
-    });
+    router.back(); 
   };
 
   return (

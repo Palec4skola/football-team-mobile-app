@@ -3,6 +3,8 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
+import { doc, updateDoc } from "firebase/firestore";
+import { db, auth } from "@/firebase";
 
 export interface PushNotificationState {
   expoPushToken?: Notifications.ExpoPushToken;
@@ -53,24 +55,42 @@ export const usePushNotifications = (): PushNotificationState => {
   }
 
   useEffect(() => {
+    // 🔔 handler (ako sa má notifikácia správať keď príde)
     Notifications.setNotificationHandler({
       handleNotification: async () => ({
         shouldShowAlert: true,
-        shouldPlaySound: false,
+        shouldPlaySound: true,
         shouldSetBadge: false,
         shouldShowBanner: true,
         shouldShowList: false,
       }),
     });
 
-    registerForPushNotificationsAsync().then((t) => {
-      if (t) setExpoPushToken(t);
+    // 🔥 registrácia + uloženie tokenu
+    registerForPushNotificationsAsync().then(async (t) => {
+      if (!t) return;
+
+      setExpoPushToken(t);
+
+      const user = auth.currentUser;
+
+      if (user?.uid) {
+        try {
+          await updateDoc(doc(db, "users", user.uid), {
+            pushToken: t.data,
+          });
+        } catch (e) {
+          console.log("Error saving push token:", e);
+        }
+      }
     });
 
+    // keď príde notifikácia (app je otvorená)
     receivedSub.current = Notifications.addNotificationReceivedListener((n) => {
       setNotification(n);
     });
 
+    //  keď user klikne na notifikáciu
     responseSub.current = Notifications.addNotificationResponseReceivedListener((r) => {
       console.log("Notification response:", r);
     });

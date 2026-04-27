@@ -1,4 +1,3 @@
-// app/team/team-chat.tsx
 import React, { useEffect, useRef } from "react";
 import {
   ActivityIndicator,
@@ -8,6 +7,7 @@ import {
   StyleSheet,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "react-native-paper";
 
 import { useTeamChat } from "@/hooks/useChat";
@@ -16,8 +16,8 @@ import { MessageInput } from "@/components/chat/MessageInput";
 import { useActiveTeam } from "@/hooks/useActiveTeam";
 
 export default function TeamChatScreen() {
-    const {teamId} = useActiveTeam();
-    const flatListRef = useRef<FlatList>(null);
+  const { teamId } = useActiveTeam();
+  const flatListRef = useRef<FlatList>(null);
 
   const {
     messages,
@@ -56,55 +56,95 @@ export default function TeamChatScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={90}
-    >
-      <FlatList
-        ref={flatListRef}
-        data={messages}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        renderItem={({ item }) => (
-          <MessageBubble
-            message={item}
-            isMine={item.senderId === currentUserId}
-          />
-        )}
-        ListEmptyComponent={
-          <View style={styles.emptyWrap}>
-            <Text>Zatiaľ tu nie sú žiadne správy.</Text>
-          </View>
-        }
-      />
+    <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 0}
+      >
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <MessageBubble
+              message={item}
+              isMine={item.senderId === currentUserId}
+            />
+          )}
+          contentContainerStyle={[
+            styles.listContent,
+            messages.length === 0 && styles.listContentEmpty,
+          ]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.emptyWrap}>
+              <Text style={styles.emptyText}>
+                Zatiaľ tu nie sú žiadne správy.
+              </Text>
+            </View>
+          }
+        />
 
-      <MessageInput
-        value={text}
-        onChangeText={setText}
-        onSend={send}
-        sending={sending}
-      />
-    </KeyboardAvoidingView>
+        <View style={styles.inputWrap}>
+          <MessageInput
+            value={text}
+            onChangeText={setText}
+            onSend={send}
+            sending={sending}
+          />
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#F8FAFC",
+  },
+
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#F8FAFC",
   },
+
   listContent: {
-    padding: 12,
-    paddingBottom: 20,
+    paddingHorizontal: 12,
+    paddingTop: 12,
+    paddingBottom: 12,
   },
+
+  listContentEmpty: {
+    flexGrow: 1,
+    justifyContent: "center",
+  },
+
+  inputWrap: {
+    paddingHorizontal: 12,
+    paddingTop: 8,
+    paddingBottom: 10,
+    backgroundColor: "#F8FAFC",
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.06)",
+  },
+
   center: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#F8FAFC",
   },
+
   emptyWrap: {
-    marginTop: 24,
     alignItems: "center",
+    paddingHorizontal: 24,
+  },
+
+  emptyText: {
+    opacity: 0.65,
+    textAlign: "center",
   },
 });

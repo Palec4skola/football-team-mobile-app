@@ -15,12 +15,6 @@ export default function CreateMatchScreen() {
 
   const vm = useCreateMatch(teamId);
 
-  const goToList = () =>
-    router.push({
-      pathname: "/match/match-list",
-      params: { teamId: teamId ?? "" },
-    });
-
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -58,7 +52,7 @@ export default function CreateMatchScreen() {
             setOpponentScore={vm.setOpponentScore}
             loading={vm.loading}
             canSubmit={vm.canSubmit}
-            onSubmit={() => vm.submit({ onSuccess: goToList })}
+            onSubmit={() => vm.submit({ onSuccess: router.back })}
           />
         )}
       </ScrollView>

@@ -82,23 +82,23 @@ export default function PlayerProfileScreen() {
       {/* Profile card */}
       <Card style={styles.profileCard} mode="elevated">
         <View style={styles.profileTopRow}>
-  {player.photoURL ? (
-    <Image source={{ uri: player.photoURL }} style={styles.avatar} />
-  ) : (
-    <View style={styles.avatarFallback}>
-      <Text style={styles.avatarFallbackText}>{initials}</Text>
-    </View>
-  )}
+          {player.photoURL ? (
+            <Image source={{ uri: player.photoURL }} style={styles.avatar} />
+          ) : (
+            <View style={styles.avatarFallback}>
+              <Text style={styles.avatarFallbackText}>{initials}</Text>
+            </View>
+          )}
 
-  <View style={styles.profileTextCol}>
-    <Text variant="titleLarge" style={styles.nameLine}>
-      {(player.firstName || "---") + " " + (player.lastName || "")}
-    </Text>
-    <Text variant="bodyMedium" style={styles.muted}>
-      {player.email || "—"}
-    </Text>
-  </View>
-</View>
+          <View style={styles.profileTextCol}>
+            <Text variant="titleLarge" style={styles.nameLine}>
+              {(player.firstName || "---") + " " + (player.lastName || "")}
+            </Text>
+            <Text variant="bodyMedium" style={styles.muted}>
+              {player.email || "—"}
+            </Text>
+          </View>
+        </View>
 
         <Divider style={styles.divider} />
 
@@ -153,7 +153,7 @@ export default function PlayerProfileScreen() {
 
       {/* Danger zone */}
       {canRemoveMember && (
-        <Card style={styles.dangerCard} mode="outlined">
+        <Card style={styles.dangerCard} mode="elevated">
           <Text variant="titleMedium" style={styles.sectionTitle}>
             Správa hráča
           </Text>
@@ -163,11 +163,12 @@ export default function PlayerProfileScreen() {
           </Text>
 
           <Button
-            mode="contained"
-            style={styles.mt16}
-            buttonColor="#d9534f"
-            onPress={removeFromTeam}
+            mode="outlined"
+            style={styles.dangerButton}
+            contentStyle={styles.dangerButtonContent}
+            textColor="#d9534f"
             icon="account-remove"
+            onPress={removeFromTeam}
           >
             Odstrániť hráča z tímu
           </Button>

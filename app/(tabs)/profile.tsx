@@ -202,7 +202,7 @@ export default function Profile() {
                 style={profileStyles.actionButton}
                 contentStyle={profileStyles.actionButtonContent}
                 icon="cog-outline"
-                onPress={() => router.push("/profileSettings")}
+                onPress={() => router.push("team/profileSettings")}
               >
                 Nastavenia
               </Button>

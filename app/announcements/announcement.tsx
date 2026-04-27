@@ -1,4 +1,3 @@
-// app/team/announcements.tsx
 import React from "react";
 import {
   ActivityIndicator,
@@ -23,12 +22,13 @@ export default function AnnouncementsScreen() {
 
   return (
     <View style={styles.container}>
+      
       {isCoach && (
         <Pressable
           style={styles.addButton}
           onPress={() =>
             router.push({
-              pathname: "/team/createAnnouncement",
+              pathname: "/announcements/createAnnouncement",
               params: { teamId },
             })
           }
@@ -49,7 +49,7 @@ export default function AnnouncementsScreen() {
               item={item}
               onPress={() =>
                 router.push({
-                  pathname: "/team/announcementDetail",
+                  pathname: "/announcements/announcementDetail",
                   params: {
                     teamId: teamId,
                     announcementId: item.id,

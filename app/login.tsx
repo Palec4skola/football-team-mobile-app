@@ -40,7 +40,6 @@ export default function LoginScreen() {
         return;
       }
 
-      Alert.alert("Úspech", "Prihlásenie úspešné.");
       router.replace("/(tabs)/home");
     } catch (error: any) {
       Alert.alert("Chyba", error.message);

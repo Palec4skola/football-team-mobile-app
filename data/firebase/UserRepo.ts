@@ -34,7 +34,7 @@ export type TeamMemberModel = {
   [key: string]: any;
 };
 
-export type UserStatKey = "height" | "weight" | "bmi" | "vo2max" | "topSpeed";
+export type UserStatKey = "height" | "weight" | "jump" | "vo2max" | "topSpeed";
 
 function normalizeRoles(roles: unknown): string[] {
   if (Array.isArray(roles)) return roles;

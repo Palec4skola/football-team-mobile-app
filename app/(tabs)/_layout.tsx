@@ -6,8 +6,10 @@ import { auth } from "@/firebase";
 import { useMyTeams } from "@/hooks/useMyTeams";
 import { userRepo } from "@/data/firebase/UserRepo";
 import { useActiveTeam } from "@/hooks/useActiveTeam";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 export default function TabsLayout() {
+  usePushNotifications();
   const router = useRouter();
 
   const [teamMenuOpen, setTeamMenuOpen] = useState(false);

@@ -38,9 +38,9 @@ export default function RootLayout() {
 
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="login" options={{ headerShown: false, title: "Prihlásenie" }} />
-        <Stack.Screen name="register" options={{ headerShown: true, title: "Registrácia" }} />
+        <Stack.Screen name="registration/register" options={{ headerShown: true, title: "Registrácia" }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="chat" options={{ headerShown: true, title: "Chaty" }} />
+        <Stack.Screen name="chat/chat" options={{ headerShown: true, title: "Tímový chat" }} />
       </Stack>
 
       <StatusBar style="auto" />

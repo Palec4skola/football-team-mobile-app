@@ -22,14 +22,14 @@ export default function WellnessTeamScreen() {
 
   const goToForm = () => {
     router.push({
-      pathname: "/team/wellnessFormScreen",
+      pathname: "/wellness/wellnessFormScreen",
       params: { teamId },
     });
   };
 
   const goToPlayerDetail = (playerId: string) => {
     router.push({
-      pathname: "/team/playerWellness",
+      pathname: "/wellness/playerWellness",
       params: { teamId, playerId },
     });
   };

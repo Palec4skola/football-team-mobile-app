@@ -51,12 +51,12 @@ export default function HomeScreen() {
   const onGoMatches = () =>
     router.push({ pathname: "/match/match-list", params: { teamId } });
   const onGoAnnouncements = () =>
-    router.push({ pathname: "/team/announcement", params: { teamId } });
+    router.push({ pathname: "/announcements/announcement", params: { teamId } });
   const onGoWellness = () =>
-    router.push({ pathname: "/team/wellness", params: { teamId } });
+    router.push({ pathname: "/wellness/teamWellness", params: { teamId } });
   const onGoAttendance = () =>
     router.push({
-      pathname: "/team/attendance",
+      pathname: "/attendance/attendanceScreen",
       params: { teamId },
     });
     if (!teamId) return null;

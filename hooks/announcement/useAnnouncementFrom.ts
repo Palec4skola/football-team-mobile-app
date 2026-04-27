@@ -98,10 +98,7 @@ export function useAnnouncementForm(params: {
           createdByName: user.displayName ?? "",
         });
 
-        router.replace({
-          pathname: "/team/announcement",
-          params: { teamId, announcementId },
-        });
+        router.back();
         return;
       }
 
@@ -115,7 +112,7 @@ export function useAnnouncementForm(params: {
         content,
       });
 
-      router.push({ pathname: "/team/announcement", params: { teamId } });
+      router.back();
     } catch (error) {
       console.error("useAnnouncementForm submit error:", error);
       Alert.alert("Chyba", "Nepodarilo sa uložiť oznámenie.");

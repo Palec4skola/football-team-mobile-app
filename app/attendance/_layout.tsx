@@ -35,20 +35,12 @@ export default function TabsLayout() {
       }}
     >
       <Stack.Screen
-        name="training-list"
-        options={{ title: "Tréningy" }}
+        name="attendanceScreen"
+        options={{ title: "Dochádzka" }}
       />
       <Stack.Screen
-        name="training-detail"
-        options={{ title: "Detail tréningu" }}
-      />
-      <Stack.Screen
-        name="create-training"
-        options={{ title: "Vytvoriť tréning" }}
-      />
-      <Stack.Screen
-        name="edit-training"
-        options={{ title: "Upraviť tréning" }}
+        name="playerAttendance"
+        options={{ title: "Dochádzka hráča" }}
       />
     </Stack>
   );

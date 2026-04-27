@@ -1,6 +1,6 @@
 import React from "react";
-import { StyleSheet } from "react-native";
-import { Card, Button, Text } from "react-native-paper";
+import { StyleSheet, View } from "react-native";
+import { Button, Text, TouchableRipple } from "react-native-paper";
 
 export function RoleSelectorCard({
   selectedRoles,
@@ -11,56 +11,112 @@ export function RoleSelectorCard({
   toggleRole: (role: string) => void;
   onSave: () => void;
 }) {
+  const isPlayerSelected = selectedRoles.includes("player");
+  const isCoachSelected = selectedRoles.includes("coach");
+
   return (
-    <>
-      <Card style={styles.roleButtonsContainer}>
-        <Button
-          style={[styles.roleButton, selectedRoles.includes("player") && styles.roleButtonSelected]}
+    <View style={styles.container}>
+      <Text style={styles.label}>Upraviť roly</Text>
+
+      <View style={styles.roleButtonsContainer}>
+        <TouchableRipple
           onPress={() => toggleRole("player")}
+          borderless={false}
+          style={[
+            styles.roleOption,
+            isPlayerSelected && styles.roleOptionSelected,
+          ]}
         >
-          <Text style={[styles.roleText, selectedRoles.includes("player") && styles.roleTextSelected]}>
+          <Text
+            style={[
+              styles.roleText,
+              isPlayerSelected && styles.roleTextSelected,
+            ]}
+          >
             Hráč
           </Text>
-        </Button>
+        </TouchableRipple>
 
-        <Button
-          style={[styles.roleButton, selectedRoles.includes("coach") && styles.roleButtonSelected]}
+        <TouchableRipple
           onPress={() => toggleRole("coach")}
+          borderless={false}
+          style={[
+            styles.roleOption,
+            isCoachSelected && styles.roleOptionSelected,
+          ]}
         >
-          <Text style={[styles.roleText, selectedRoles.includes("coach") && styles.roleTextSelected]}>
+          <Text
+            style={[
+              styles.roleText,
+              isCoachSelected && styles.roleTextSelected,
+            ]}
+          >
             Tréner
           </Text>
-        </Button>
-      </Card>
+        </TouchableRipple>
+      </View>
 
-      <Button style={styles.saveButton} onPress={onSave}>
-        <Text style={styles.saveButtonText}>Uložiť roly</Text>
+      <Button
+        mode="contained"
+        style={styles.saveButton}
+        contentStyle={styles.saveButtonContent}
+        onPress={onSave}
+      >
+        Uložiť roly
       </Button>
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  roleButtonsContainer: { flexDirection: "row", marginTop: 10 },
-  roleButton: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#007AFF",
-    borderRadius: 8,
-    paddingVertical: 10,
-    marginHorizontal: 5,
-    alignItems: "center",
+  container: {
+    marginTop: 6,
   },
-  roleButtonSelected: { backgroundColor: "#007AFF" },
-  roleText: { color: "#007AFF", fontWeight: "500" },
-  roleTextSelected: { color: "white" },
+
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 10,
+    opacity: 0.7,
+  },
+
+  roleButtonsContainer: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 14,
+  },
+
+  roleOption: {
+    flex: 1,
+    minHeight: 52,
+    borderWidth: 1,
+    borderColor: "rgba(0,122,255,0.35)",
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
+  },
+
+  roleOptionSelected: {
+    backgroundColor: "#007AFF",
+    borderColor: "#007AFF",
+  },
+
+  roleText: {
+    color: "#007AFF",
+    fontWeight: "600",
+    fontSize: 16,
+  },
+
+  roleTextSelected: {
+    color: "#fff",
+  },
 
   saveButton: {
-    marginTop: 20,
-    backgroundColor: "#007AFF",
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
+    borderRadius: 14,
   },
-  saveButtonText: { color: "white", fontWeight: "600", fontSize: 16 },
+
+  saveButtonContent: {
+    minHeight: 52,
+  },
 });

@@ -61,8 +61,8 @@ export default function VerifyEmailScreen() {
         Znovu poslať e-mail
       </Button>
 
-      <Button onPress={() => router.replace("/login")}>
-        Späť na prihlásenie
+      <Button onPress={() => router.replace("/registration/choose-join-or-create")}>
+        Pokračovat bez overenia
       </Button>
     </View>
   );

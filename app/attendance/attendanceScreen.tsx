@@ -18,7 +18,7 @@ export default function AttendanceScreen() {
 
   const onPressPlayer = (playerId: string) => {
     router.push({
-      pathname: "/team/playerAttendance",
+      pathname: "/attendance/playerAttendance",
       params: { teamId, playerId },
     });
   };
