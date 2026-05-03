@@ -6,6 +6,13 @@ export const styles = StyleSheet.create({
     backgroundColor: "#f5f7fa",
     padding: 16,
   },
+  row: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  rowButton: {
+    flex: 1,
+  },
 
   card: {
     backgroundColor: "#ffffff",

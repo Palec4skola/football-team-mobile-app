@@ -42,9 +42,50 @@ To learn more about developing your project with Expo, look at the following res
 - [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
 - [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
 
-## Join the community
+## Architektúra projektu
 
-Join our community of developers creating universal apps.
+Projekt je rozdelený do viacerých priečinkov podľa funkčnosti a zodpovednosti:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- **app/** – Hlavný adresár s obrazovkami aplikácie a routovaním (file-based routing). Obsahuje podpriečinky pre jednotlivé sekcie (napr. `announcements/`, `attendance/`, `chat/`, `match/`, `registration/`, `team/`, `training/`, `wellness/`).
+- **components/** – Znovupoužiteľné React komponenty rozdelené podľa funkcie alebo sekcie aplikácie.
+- **constants/** – Konštanty a témy (napr. farby, štýly).
+- **data/** – Dátové modely alebo mock dáta (ak sú použité).
+- **functions/** – Serverless funkcie alebo backend logika (napr. Firebase Functions).
+- **hooks/** – Vlastné React hooky pre opakované logiky (napr. prístup k tímom, profilom, attendance, atď.).
+- **services/** – Logika pre komunikáciu s backendom alebo externými službami (napr. wellness, teams).
+- **styles/** – Samostatné súbory so štýlmi pre jednotlivé obrazovky alebo komponenty.
+- **utils/** – Pomocné utility funkcie (napr. na prácu s dátumami, rolami, kódmi tímov).
+- **assets/** – Obrázky a ďalšie statické súbory.
+
+### Hlavné súbory
+
+- `app.json`, `eas.json`, `firebase.json` – Konfiguračné súbory pre Expo, EAS a Firebase.
+- `package.json` – Zoznam závislostí a skriptov.
+- `README.md` – Tento súbor s dokumentáciou.
+
+### Príklad štruktúry
+
+```text
+app/
+   announcements/
+   attendance/
+   chat/
+   ...
+components/
+   profile/
+   team/
+   ...
+hooks/
+   useTeamMembers.ts
+   useProfilePhoto.ts
+   ...
+services/
+   wellness/
+   teams/
+   ...
+utils/
+   dateUtils.ts
+   ...
+```
+
+Každý priečinok je zameraný na konkrétnu časť aplikácie alebo typ logiky, čo uľahčuje orientáciu a rozširovanie projektu.

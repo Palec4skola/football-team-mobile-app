@@ -82,7 +82,7 @@ export const wellnessRepo = {
   const ref = entryRef(teamId, dateKey, userId);
   const existing = await getDoc(ref);
 
-  const score = computeWellnessScore10(input); // ✅ vypočítaj tu
+  const score = computeWellnessScore10(input);
 
   const payload: WellnessEntryWrite & { score: number } = {
     ...input,

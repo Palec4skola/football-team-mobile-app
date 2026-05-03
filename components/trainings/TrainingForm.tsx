@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Platform,
   View,
@@ -8,6 +8,21 @@ import {
 import { Button, Text, TextInput } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { styles } from "@/styles/trainingForm.styles";
+
+function formatDate(d: Date) {
+  return d.toLocaleDateString("sk-SK", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
+function formatTime(d: Date) {
+  return d.toLocaleTimeString("sk-SK", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 export function TrainingForm({
   name,
@@ -28,11 +43,31 @@ export function TrainingForm({
   submitting: boolean;
   onSubmit: () => void;
 }) {
-  const [showPicker, setShowPicker] = React.useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
 
   const onChangeDate = (_: any, selected?: Date) => {
-    if (Platform.OS !== "ios") setShowPicker(false);
-    if (selected) onChangeStartsAt(selected);
+    setShowDatePicker(Platform.OS === "ios");
+    if (!selected) return;
+
+    const next = new Date(startsAt);
+    next.setFullYear(
+      selected.getFullYear(),
+      selected.getMonth(),
+      selected.getDate()
+    );
+
+    onChangeStartsAt(next);
+  };
+
+  const onChangeTime = (_: any, selected?: Date) => {
+    setShowTimePicker(Platform.OS === "ios");
+    if (!selected) return;
+
+    const next = new Date(startsAt);
+    next.setHours(selected.getHours(), selected.getMinutes(), 0, 0);
+
+    onChangeStartsAt(next);
   };
 
   return (
@@ -53,21 +88,42 @@ export function TrainingForm({
           </View>
 
           <View style={styles.fieldWrapper}>
-            <Text style={styles.label}>Dátum</Text>
-            <Button
-              mode="outlined"
-              onPress={() => setShowPicker(true)}
-              style={styles.dateButton}
-            >
-              {startsAt.toLocaleDateString()}
-            </Button>
+            <Text style={styles.label}>Dátum a čas</Text>
 
-            {showPicker && (
+            <View style={styles.row}>
+              <Button
+                mode="outlined"
+                onPress={() => setShowDatePicker(true)}
+                style={[styles.dateButton, styles.rowButton]}
+              >
+                {formatDate(startsAt)}
+              </Button>
+
+              <Button
+                mode="outlined"
+                onPress={() => setShowTimePicker(true)}
+                style={[styles.dateButton, styles.rowButton]}
+              >
+                {formatTime(startsAt)}
+              </Button>
+            </View>
+
+            {showDatePicker && (
               <DateTimePicker
                 value={startsAt}
                 mode="date"
                 display="default"
                 onChange={onChangeDate}
+              />
+            )}
+
+            {showTimePicker && (
+              <DateTimePicker
+                value={startsAt}
+                mode="time"
+                is24Hour
+                display="default"
+                onChange={onChangeTime}
               />
             )}
           </View>
