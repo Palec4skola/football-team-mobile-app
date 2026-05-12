@@ -10,7 +10,7 @@ import { useTeamMembers } from "@/hooks/useTeamMembers";
 
 import { useMatch } from "@/hooks/match/useMatch";
 import { useAttendance } from "@/hooks/useAttendance";
-import Entypo from '@expo/vector-icons/Entypo';
+import Entypo from "@expo/vector-icons/Entypo";
 import {
   attendanceRepo,
   AttendanceStatus,
@@ -100,12 +100,30 @@ export default function MatchDetailScreen() {
         }}
       >
         <Text variant="titleMedium">{match.opponent}</Text>
+        {match.result ? (
+          <View
+            style={{
+              marginTop: 10,
+              marginBottom: 8,
+              paddingVertical: 8,
+              paddingHorizontal: 12,
+              borderRadius: 8,
+              backgroundColor: "#ffffff",
+              alignSelf: "flex-start",
+            }}
+          >
+            <Text variant="titleLarge" style={{ fontWeight: "bold" }}>
+              {match.result?.team} : {match.result?.opponent}
+            </Text>
+          </View>
+        ) : null}
         <Text>Dátum: {formattedDate}</Text>
         {match.place ? <Text>Miesto: {match.place}</Text> : null}
         {match.matchLink ? (
           <TouchableOpacity onPress={openMatchLink}>
             <Text style={{ color: "#2563EB", marginTop: 6 }}>
-              <Entypo name="video" size={24} color="black" /> Pozrieť video / odkaz
+              <Entypo name="video" size={24} color="black" /> Pozrieť video /
+              odkaz
             </Text>
           </TouchableOpacity>
         ) : null}

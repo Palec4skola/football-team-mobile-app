@@ -39,7 +39,7 @@ const { matches, loading } = useTeamMatches(teamId, filter);
           {item.place ? <Text>Miesto: {item.place}</Text> : null}
           {item.result ? (
             <Text>
-              Výsledok: {item.result.home}:{item.result.away}
+              Výsledok: {item.result.team}:{item.result.opponent}
             </Text>
           ) : (
             <Text>Výsledok: —</Text>
